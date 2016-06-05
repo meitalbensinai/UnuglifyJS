@@ -99,7 +99,7 @@ var HOST = ARGS.nice2predict_server.split(":")[0];
 var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 
 //make only one mode active
-if (ARGS.extract_feeatures){
+if (ARGS.extract_features){
 	ARGS.rename = false;
 }
 
