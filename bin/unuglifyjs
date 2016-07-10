@@ -170,6 +170,7 @@ function processFile(file) {
 			//sys.error("WARN: ".yellow + "skipping minified file '" + file + "'");
 		} else {
 			sys.error("ERROR: ".red + "'" + file + "': " + ex);
+			sys.error(ex.stack);
 		}
 
 		return;
