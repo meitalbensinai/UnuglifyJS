@@ -26,7 +26,7 @@ TMP_DIR = ""
 
 def ExtractFeaturesForFile(f):
   global TMP_DIR
-  os.system("nodejs bin/unuglifyjs --extract_features --max_path_length=2 --skip_minified '%s' >> %s/%d" % (f, TMP_DIR, os.getpid()))
+  os.system("nodejs bin/unuglifyjs --extract_features --max_path_length=10 --skip_minified '%s' >> %s/%d" % (f, TMP_DIR, os.getpid()))
 
 def ExtractFeaturesForFileList(files):
   global TMP_DIR

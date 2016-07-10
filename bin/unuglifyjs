@@ -231,7 +231,7 @@ function processFile(file) {
 						}
 					}
 					try {
-						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names);
+						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names, ARGS.max_path_length);
 						console.log(renamed_js);
 					} catch (ex) {
 						sys.error("ERROR: ".red + "failed rename '" + file + "': " + ex);
