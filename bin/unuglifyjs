@@ -25,11 +25,13 @@ var ARGS = yargs
 	.describe("package", "Build itself (UnuglifyJS) as a library")
 	.describe("colored", "Add colors to the output")
 	.describe("V", "Print version number and exit.")
+	.describe("max_path_length", "The Maximum path length between literals to generate a feature")
 	//.demand(1)
 	.alias("V", "version")
 	.default('features', 'ASTREL,FNAMES,FSCOPE')
 	.default('nice2predict_server', 'www.nice2predict.org:5745')
 	.default('rename', true)
+	.default('max_path_length', 10)
 	.boolean("rename")
 	.boolean('extract_features')
 	.boolean("print_ast")
@@ -38,6 +40,7 @@ var ARGS = yargs
 	.boolean("package")
 	.boolean("V")
 	.boolean("colors")
+	.string('max_path_length')
 	.string("features")
 	.string("nice2predict_server")
 	.wrap(80)
@@ -159,7 +162,7 @@ function processFile(file) {
 	}
 
 	try {
-		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.features, ARGS.skip_minified);
+		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.skip_minified);
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
 			sys.error("ERROR: ".red + "cannot parse file '" + file + "': " + ex.message);
