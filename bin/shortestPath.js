@@ -8,3 +8,5 @@ var fs = require("fs");
 var http = require('http');
 var json = require("../package.json");
 
+var str = '* *';
+console.log(UglifyJS.escapeString(str));
