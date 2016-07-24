@@ -8,7 +8,7 @@ import shutil
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory>
+  evaluate_dir.py --dir <directory> --nice2predict_server <server>
 """
   exit(1)
 
@@ -21,10 +21,18 @@ def GetJSFilesInDir(d):
 
 
 TMP_DIR = ""
+SERVER = "";
+if (len(sys.argv) > 4):
+  SERVER = sys.argv[4]
+else:
+  SERVER = "www.nice2predict.org:5745"
+
 
 def EvaluateFile(f):
   global TMP_DIR
-  os.system("nodejs bin/unuglifyjs --evaluate --max_path_length=10 --skip_minified '%s' >> %s/%d" % (f, TMP_DIR, os.getpid()))
+  #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s >> %s/%d" % (f, SERVER, TMP_DIR, os.getpid())
+  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
+  os.system(nodejsCommand)
 
 def EvaluateFileList(files):
   global TMP_DIR
