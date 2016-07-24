@@ -30,8 +30,8 @@ else:
 
 def EvaluateFile(f):
   global TMP_DIR
-  #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s >> %s/%d" % (f, SERVER, TMP_DIR, os.getpid())
-  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
+  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s >> %s/%d" % (f, SERVER, TMP_DIR, os.getpid())
+  #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
   os.system(nodejsCommand)
 
 def EvaluateFileList(files):
@@ -44,8 +44,18 @@ def EvaluateFileList(files):
     p = multiprocessing.Pool(multiprocessing.cpu_count())
     p.map(EvaluateFile, files)
     output_files = os.listdir(TMP_DIR)
+    correct_predictions = 0
+    total_predictions = 0
+
     for f in output_files:
-      os.system("cat %s/%s" % (TMP_DIR, f))
+      #os.system("cat %s/%s" % (TMP_DIR, f))
+      with open(TMP_DIR + "/" + f) as opened_file:
+        lines = [line.rstrip('\n') for line in opened_file]
+        for line in lines:
+          parts = line.split()
+          correct_predictions += int(parts[0])
+          total_predictions += int(parts[1])
+    print "%s / %s" % (correct_predictions, total_predictions)
   finally:
     shutil.rmtree(TMP_DIR)
 
