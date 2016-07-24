@@ -1,2 +1,8 @@
 tmp/
 node_modules/
+/extract_features.pyc
+/training_data
+/.idea/jsLibraryMappings.xml
+/.idea/libraries/UnuglifyJS_node_modules.xml
+/.idea/workspace.xml
+/jsconfig.json

@@ -252,7 +252,8 @@ function processFile(file) {
 							var originalName = originalNames[id];
 							if (inferredName === originalName) {
 								correctly_inferred_names++;
-							}
+                            }
+                            console.log("Original name: " + originalName + ", predicted: " + inferredName);
 						}
 					}
 					console.log(correctly_inferred_names + " " + total_inferred);
