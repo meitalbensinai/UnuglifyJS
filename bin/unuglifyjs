@@ -244,6 +244,7 @@ function processFile(file) {
 					var result = data_json.result;
 					var correctly_inferred_names = 0;
 					var total_inferred = 0;
+					console.log(file);
 					for (var i = 0; i < result.length; i++) {
 						if (result[i].hasOwnProperty("inf")) {
 							total_inferred++;
@@ -253,7 +254,7 @@ function processFile(file) {
 							if (inferredName === originalName) {
 								correctly_inferred_names++;
                             }
-                            console.log("Original name: " + originalName + ", predicted: " + inferredName);
+                            console.log("\tOriginal name: \"" + originalName + "\", predicted: \"" + inferredName + "\"");
 						}
 					}
 					console.log(correctly_inferred_names + " " + total_inferred);

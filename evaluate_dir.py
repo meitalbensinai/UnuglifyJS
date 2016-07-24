@@ -51,10 +51,15 @@ def EvaluateFileList(files):
       #os.system("cat %s/%s" % (TMP_DIR, f))
       with open(TMP_DIR + "/" + f) as opened_file:
         lines = [line.rstrip('\n') for line in opened_file]
-        line = lines[-1]
-        parts = line.split()
-        correct_predictions += int(parts[0])
-        total_predictions += int(parts[1])
+        for index,line in enumerate(lines):
+          if (index == 0):
+            print "in file: " + line
+          elif (index == len(lines) - 1):
+            parts = line.split()
+            correct_predictions += int(parts[0])
+            total_predictions += int(parts[1])
+          else:
+            print line
     print "%s / %s" % (correct_predictions, total_predictions)
   finally:
     shutil.rmtree(TMP_DIR)
