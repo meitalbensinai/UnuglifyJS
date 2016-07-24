@@ -34,6 +34,7 @@ var ARGS = yargs
 	.default('max_path_length', 10)
 	.boolean("rename")
 	.boolean('extract_features')
+	.boolean('evaluate')
 	.boolean("print_ast")
 	.boolean("skip_minified")
 	.boolean("nice_formatting")
@@ -102,7 +103,7 @@ var HOST = ARGS.nice2predict_server.split(":")[0];
 var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 
 //make only one mode active
-if (ARGS.extract_features){
+if (ARGS.extract_features || ARGS.evaluate){
 	ARGS.rename = false;
 }
 
@@ -189,9 +190,10 @@ function processFile(file) {
 		output = removeWhitespace(output);
 	}
 
-	//validate JSON	
+	//validate JSON
+	var features_result;
     try {
-        JSON.parse(output);
+		features_result = JSON.parse(output);
     } catch (e) {
 		sys.error("ERROR: ".red + "output is not valid JSON " + "'" + file + "'");
         throw e;
@@ -211,12 +213,64 @@ function processFile(file) {
 		return;
 	}
 
+	if (ARGS.evaluate) {
+		var originalNames = [];
+		for (var i=0 ; i< features_result.assign.length ; i++) {
+			var currentAssignItem = features_result.assign[i];
+			var originalId = currentAssignItem.v;
+			var originalName;
+			if (currentAssignItem.hasOwnProperty("inf")) {
+				originalName = currentAssignItem.inf;
+			} else {
+				originalName = currentAssignItem.giv;
+			}
+			originalNames[originalId] = originalName;
+		}
+		var minified = UglifyJS.minify([file]);
+		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, false);
+		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
+
+		callServer(
+			HOST,
+			PORT,
+			"infer",
+			minifiedFeatures,
+			function(data) {
+				var data_json = JSON.parse(data);
+				if (data_json.hasOwnProperty('error')){
+					console.log("ERROR: ".red + data_json.error.message);
+				}
+				else if (data_json.hasOwnProperty('result')) {
+					var result = data_json.result;
+					var correctly_inferred_names = 0;
+					var total_inferred = 0;
+					for (var i = 0; i < result.length; i++) {
+						if (result[i].hasOwnProperty("inf")) {
+							total_inferred++;
+							var id = result[i].v;
+							var inferredName = result[i].inf;
+							var originalName = originalNames[id];
+							if (inferredName === originalName) {
+								correctly_inferred_names++;
+							}
+						}
+					}
+					console.log(correctly_inferred_names + " " + total_inferred);
+				} else {
+					sys.error("ERROR: ".red + "undefined response. Try to update unuglify-js to the latest version by 'npm update -g unuglify-js'");
+				}
+			},
+			function(err) {
+				sys.error("ERROR: ".red + "connecting to server '" + HOST + ":" + PORT + "' " + err);
+			});
+		return;
+	}
 	if (ARGS.rename){
 		callServer(
 			HOST,
 			PORT,
 			"infer",
-			JSON.parse(output),
+			features_result,
 			function(data) {
 				var data_json = JSON.parse(data);
 				if (data_json.hasOwnProperty('error')){
