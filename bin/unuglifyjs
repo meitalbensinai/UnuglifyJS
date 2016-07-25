@@ -232,7 +232,7 @@ function processFile(file) {
 		var minified = UglifyJS.minify([file], {compress: false});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, false, ARGS.original_features, ARGS.features);
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
-		console.log(minifiedFeaturesJson);
+
 		callServer(
 			HOST,
 			PORT,

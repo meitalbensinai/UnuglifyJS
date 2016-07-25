@@ -30,7 +30,11 @@ else:
 
 def EvaluateFile(f):
   global TMP_DIR
-  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s >> %s/%d" % (f, SERVER, TMP_DIR, os.getpid())
+  original_features_flag = ""
+  if (sys.argv[5] == '--original_features'):
+      original_features_flag = '--original_features'
+  
+  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s >> %s/%d" % (f, original_features_flag, SERVER, TMP_DIR, os.getpid())
   #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
   os.system(nodejsCommand)
 
