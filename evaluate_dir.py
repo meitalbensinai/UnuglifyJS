@@ -8,7 +8,7 @@ import shutil
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory> --nice2predict_server <server>
+  evaluate_dir.py --dir <directory> --nice2predict_server <server> [--original_features]
 """
   exit(1)
 
