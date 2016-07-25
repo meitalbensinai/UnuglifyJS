@@ -8,9 +8,9 @@ import shutil
 def PrintUsage():
   print """
 Usage:
-  extract_features.py --filelist <file>
+  extract_features.py --filelist <file> --max_path_length <number>
 OR
-  extract_features.py --dir <directory>
+  extract_features.py --dir <directory> --max_path_length <number>
 """
   exit(1)
 
@@ -23,10 +23,16 @@ def GetJSFilesInDir(d):
 
 
 TMP_DIR = ""
+original_features = ""
+MAX_PATH_LENGTH = 0
+if ((len(sys.argv) > 4) and (sys.argv[3] == "--max_path_length")):
+    MAX_PATH_LENGTH = int(sys.argv[4])
+else:
+    original_features = "--original_features"
 
 def ExtractFeaturesForFile(f):
   global TMP_DIR
-  os.system("nodejs bin/unuglifyjs --extract_features --max_path_length=10 --skip_minified '%s' >> %s/%d" % (f, TMP_DIR, os.getpid()))
+  os.system("nodejs bin/unuglifyjs --extract_features --max_path_length=%d --skip_minified '%s' %s >> %s/%d" % (MAX_PATH_LENGTH, f, original_features, TMP_DIR, os.getpid()))
 
 def ExtractFeaturesForFileList(files):
   global TMP_DIR
@@ -45,7 +51,7 @@ def ExtractFeaturesForFileList(files):
 
 
 if __name__ == '__main__':
-  if (len(sys.argv) <= 1):
+  if (len(sys.argv) <= 3):
     PrintUsage()
 
   # Process command line arguments
@@ -55,6 +61,7 @@ if __name__ == '__main__':
     files = [f for f in GetJSFilesInDir(sys.argv[2])]
   else:
     PrintUsage()
+  
   # Remove files that say they are minified.
   files = [f for f in files if not f.endswith('.min.js')]
   ExtractFeaturesForFileList(files)
