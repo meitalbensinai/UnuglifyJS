@@ -31,8 +31,8 @@ else:
     original_features = "--original_features"
 
 def ExtractFeaturesForFile(f):
-  global TMP_DIR
-  os.system("nodejs bin/unuglifyjs --extract_features --max_path_length=%d --skip_minified '%s' %s >> %s/%d" % (MAX_PATH_LENGTH, f, original_features, TMP_DIR, os.getpid()))
+  command = "nodejs bin/unuglifyjs --extract_features --max_path_length=%d --skip_minified '%s' %s >> %s/%d" % (MAX_PATH_LENGTH, f, original_features, TMP_DIR, os.getpid())
+  os.system(command)
 
 def ExtractFeaturesForFileList(files):
   global TMP_DIR
