@@ -111,6 +111,7 @@ if __name__ == '__main__':
       os.system(command)
     finally:
       server_process.send_signal(2)
+      print "Nice2Server stopped"
 
 
   # Test original
