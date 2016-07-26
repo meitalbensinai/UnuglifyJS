@@ -143,12 +143,13 @@ if __name__ == '__main__':
     os.system(command)
   finally:
     server_process.send_signal(2)
+    print "Nice2Server stopped"
 
   for max_length_candidate in path_lengths:
     with open("results_%d" % (max_length_candidate), "r") as resultsFile:
-      line = resultsFile.readline()
+      line = resultsFile.readline().strip()
     print("MAX PATH LENGTH=%d: %s" % (max_length_candidate, line))
   with open("results_0", "r") as resultsFile:
-      line = resultsFile.readline()
+      line = resultsFile.readline().strip()
   print("ORIGINAL UnuglifyJS: %s" % line)
 
