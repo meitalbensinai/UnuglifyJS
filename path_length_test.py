@@ -68,7 +68,7 @@ if __name__ == '__main__':
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, 2)
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, 4)
       #command = "python ./evaluate_dir.py --dir %s --server %s" % (test_dir, server)
       print command
       os.system(command)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         print 'Nice2Server started'
 
     os.chdir("../UnuglifyJS")
-    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, 2)
+    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, 4)
 
     print command
     os.system(command)
