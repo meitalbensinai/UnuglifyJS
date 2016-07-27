@@ -4,11 +4,12 @@ import multiprocessing
 import os
 import sys
 import shutil
+import re
 
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features]
+  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] -num_threads <number>
 """
   exit(1)
 
@@ -27,6 +28,10 @@ if (len(sys.argv) > 4):
 else:
   SERVER = "www.nice2predict.org:5745"
 
+NUM_THREADS = 1
+if (len(sys.argv) > 11):
+  NUM_THREADS = int(sys.argv[11])
+
 LOGFILE = sys.argv[6]
 RESULTSFILE = sys.argv[8]
 
@@ -43,34 +48,35 @@ def EvaluateFile(f):
 
 def EvaluateFileList(files):
   global TMP_DIR
+  resultRegex = re.compile('^\d* \d*$')
   TMP_DIR = "./tmp/evaluate_dir%d" % (os.getpid())
   if os.path.exists(TMP_DIR):
     shutil.rmtree(TMP_DIR)
   os.makedirs(TMP_DIR)
   try:
-    p = multiprocessing.Pool(multiprocessing.cpu_count())
+    p = multiprocessing.Pool(NUM_THREADS)
     p.map(EvaluateFile, files)
     output_files = os.listdir(TMP_DIR)
     correct_predictions = 0
     total_predictions = 0
-
-    for f in output_files:
-      #os.system("cat %s/%s" % (TMP_DIR, f))
-      with open(TMP_DIR + "/" + f) as opened_file:
-        lines = [line.rstrip('\n') for line in opened_file]
-        for index,line in enumerate(lines):
-          message = ""
-          if (index == 0):
-            message = "in file: " + line
-          elif (index == len(lines) - 1):
-            parts = line.split()
-            correct_predictions += int(parts[0])
-            total_predictions += int(parts[1])
-          else:
-            message = line
-          if (len(message) > 0):
-            print message
-            with open(LOGFILE, "a") as logFile:
+    
+    with open(LOGFILE, "a") as logFile:
+      for f in output_files:
+        #os.system("cat %s/%s" % (TMP_DIR, f))
+        with open(TMP_DIR + "/" + f) as opened_file:
+          lines = [line.rstrip('\n') for line in opened_file]
+          for index,line in enumerate(lines):
+            message = ""
+            if (line.startswith("./")):
+              message = "in file: " + line
+            elif (resultRegex.match(line)):
+              parts = line.split()
+              correct_predictions += int(parts[0])
+              total_predictions += int(parts[1])
+            else:
+              message = line
+            if (len(message) > 0):
+              print message
               logFile.write(message + "\n")
     final_sum = "%s / %s" % (correct_predictions, total_predictions)
     print final_sum

@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import sys
 import shutil
-from subprocess import Popen,PIPE, STDOUT
+from subprocess import Popen,PIPE, STDOUT, call
 import time
 
 def PrintUsage():
@@ -23,46 +23,6 @@ def GetJSFilesInDir(d):
 
 
 TMP_DIR = ""
-
-def EvaluateFile(f):
-  global TMP_DIR
-  original_features_flag = ""
-  if (sys.argv[5] == '--original_features'):
-      original_features_flag = '--original_features'
-
-  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s >> %s/%d" % (f, original_features_flag, SERVER, TMP_DIR, os.getpid())
-  #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
-  os.system(nodejsCommand)
-
-def EvaluateFileList(files):
-  global TMP_DIR
-  TMP_DIR = "./tmp/evaluate_dir%d" % (os.getpid())
-  if os.path.exists(TMP_DIR):
-    shutil.rmtree(TMP_DIR)
-  os.makedirs(TMP_DIR)
-  try:
-    p = multiprocessing.Pool(multiprocessing.cpu_count())
-    p.map(EvaluateFile, files)
-    output_files = os.listdir(TMP_DIR)
-    correct_predictions = 0
-    total_predictions = 0
-
-    for f in output_files:
-      #os.system("cat %s/%s" % (TMP_DIR, f))
-      with open(TMP_DIR + "/" + f) as opened_file:
-        lines = [line.rstrip('\n') for line in opened_file]
-        for index,line in enumerate(lines):
-          if (index == 0):
-            print "in file: " + line
-          elif (index == len(lines) - 1):
-            parts = line.split()
-            correct_predictions += int(parts[0])
-            total_predictions += int(parts[1])
-          else:
-            print line
-    print "%s / %s" % (correct_predictions, total_predictions)
-  finally:
-    shutil.rmtree(TMP_DIR)
 
 
 if __name__ == '__main__':
@@ -89,8 +49,10 @@ if __name__ == '__main__':
     os.chdir("../Nice2Predict")
     command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d" % (num_threads, max_length_candidate)
     print command
-    os.system(command)
-    
+    exit_code = call(command.split(' '))
+    if (exit_code != 0):
+      print "Training faild for max path length = %d, exiting" % max_length_candidate
+      sys.exit(0)
 
     command = "./bin/server/nice2server"
     print command
@@ -100,12 +62,13 @@ if __name__ == '__main__':
       server_is_up = False
       while not server_is_up:
         nextline = server_process.stdout.readline()
+        print nextline
         if nextline.find("Nice2Server started") >= 0:
           server_is_up = True
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d" % (test_dir, server, max_length_candidate, max_length_candidate)
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, 2)
       #command = "python ./evaluate_dir.py --dir %s --server %s" % (test_dir, server)
       print command
       os.system(command)
@@ -122,8 +85,10 @@ if __name__ == '__main__':
   os.chdir("../Nice2Predict")
   command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0" % (num_threads)
   print command
-  os.system(command)
-  
+  exit_code = call(command.split(' '))
+  if (exit_code != 0):
+      print "Training faild for original features, exiting" 
+      sys.exit(0)
 
   command = "./bin/server/nice2server"
   print command
@@ -133,12 +98,13 @@ if __name__ == '__main__':
     server_is_up = False
     while not server_is_up:
       nextline = server_process.stdout.readline()
+      print nextline
       if nextline.find("Nice2Server started") >= 0:
         server_is_up = True
         print 'Nice2Server started'
 
     os.chdir("../UnuglifyJS")
-    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features" % (test_dir, server)
+    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, 2)
 
     print command
     os.system(command)

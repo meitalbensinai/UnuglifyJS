@@ -254,10 +254,12 @@ function processFile(file) {
 							var id = result[i].v;
 							var inferredName = result[i].inf;
 							var originalName = originalNames[id];
+							var label = "error";
 							if (inferredName === originalName) {
 								correctly_inferred_names++;
+								label = "ok";
                             }
-                            console.log("\tOriginal name: \"" + originalName + "\", predicted: \"" + inferredName + "\"");
+                            console.log("\tOriginal name: \"" + originalName + "\", predicted: \"" + inferredName + "\" (" + label + ")");
 						}
 					}
 					console.log(correctly_inferred_names + " " + total_inferred);
