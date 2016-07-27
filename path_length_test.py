@@ -87,14 +87,14 @@ if __name__ == '__main__':
     os.system(command)
     
     os.chdir("../Nice2Predict")
-    command = "bin/training/train --logtostderr -num_threads %d  --input ./../UnuglifyJS/training_data_%d" % (num_threads, max_length_candidate)
+    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d" % (num_threads, max_length_candidate)
     print command
     os.system(command)
     
 
-    command = "./bin/server/nice2server --logtostderr"
+    command = "./bin/server/nice2server"
     print command
-    server_process = Popen(["./bin/server/nice2server", "--logtostderr"], stdout=PIPE, bufsize=1, stderr=STDOUT)
+    server_process = Popen(["./bin/server/nice2server"], stdout=PIPE, bufsize=1, stderr=STDOUT)
     #time.sleep(3)
     try:
       server_is_up = False
@@ -120,14 +120,14 @@ if __name__ == '__main__':
   os.system(command)
   
   os.chdir("../Nice2Predict")
-  command = "bin/training/train --logtostderr -num_threads %d  --input ./../UnuglifyJS/training_data_0" % (num_threads)
+  command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0" % (num_threads)
   print command
   os.system(command)
   
 
-  command = "./bin/server/nice2server --logtostderr"
+  command = "./bin/server/nice2server"
   print command
-  server_process = Popen(["./bin/server/nice2server", "--logtostderr"], stdout=PIPE, bufsize=1, stderr=STDOUT)
+  server_process = Popen(["./bin/server/nice2server"], stdout=PIPE, bufsize=1, stderr=STDOUT)
   #time.sleep(3)
   try:
     server_is_up = False
