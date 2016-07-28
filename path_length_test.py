@@ -47,7 +47,7 @@ if __name__ == '__main__':
     os.system(command)
     
     os.chdir("../Nice2Predict")
-    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d" % (num_threads, max_length_candidate)
+    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d -training_method pl -beam_size 16" % (num_threads, max_length_candidate)
     print command
     exit_code = call(command.split(' '))
     if (exit_code != 0):
@@ -68,7 +68,7 @@ if __name__ == '__main__':
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, 4)
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count())
       #command = "python ./evaluate_dir.py --dir %s --server %s" % (test_dir, server)
       print command
       os.system(command)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
   os.system(command)
   
   os.chdir("../Nice2Predict")
-  command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0" % (num_threads)
+  command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0 -training_method pl -beam_size 16" % (num_threads)
   print command
   exit_code = call(command.split(' '))
   if (exit_code != 0):
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         print 'Nice2Server started'
 
     os.chdir("../UnuglifyJS")
-    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, 4)
+    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, multiprocessing.cpu_count())
 
     print command
     os.system(command)
