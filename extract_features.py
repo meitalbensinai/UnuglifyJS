@@ -10,7 +10,7 @@ def PrintUsage():
 Usage:
   extract_features.py --filelist <file> --max_path_length <number>
 OR
-  extract_features.py --dir <directory> --max_path_length <number>
+  extract_features.py --dir <directory> --max_path_length <number> [--infer_labels]
 """
   exit(1)
 
@@ -29,9 +29,14 @@ if ((len(sys.argv) > 4) and (sys.argv[3] == "--max_path_length")):
     MAX_PATH_LENGTH = int(sys.argv[4])
 else:
     original_features = "--original_features"
+infer_labels = ""
+nodejsFile = "unuglifyjs"
+if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels"):
+    infer_labels = "--infer_labels"
+    nodejsFile = "unuglifyjs-labels.js"
 
 def ExtractFeaturesForFile(f):
-  command = "nodejs bin/unuglifyjs --extract_features --max_path_length=%d --skip_minified '%s' %s >> %s/%d" % (MAX_PATH_LENGTH, f, original_features, TMP_DIR, os.getpid())
+  command = "nodejs bin/%s --extract_features --max_path_length=%d --skip_minified '%s' %s %s >> %s/%d" % (nodejsFile, MAX_PATH_LENGTH, f, original_features, infer_labels, TMP_DIR, os.getpid())
   os.system(command)
 
 def ExtractFeaturesForFileList(files):
