@@ -9,7 +9,7 @@ import re
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] -num_threads <number>
+  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] --num_threads <number> --max_path_length <number>
 """
   exit(1)
 
@@ -32,6 +32,10 @@ NUM_THREADS = 1
 if (len(sys.argv) > 11):
   NUM_THREADS = int(sys.argv[11])
 
+MAX_PATH_LENGTH = 0
+if (len(sys.argv) > 13):
+	MAX_PATH_LENGTH = int(sys.argv[13])
+  
 LOGFILE = sys.argv[6]
 RESULTSFILE = sys.argv[8]
 
@@ -41,9 +45,12 @@ def EvaluateFile(f):
   if ((len(sys.argv) > 9) and (sys.argv[9] == '--original_features')):
       original_features_flag = '--original_features'
   
-  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s >> %s/%d" % (f, original_features_flag, SERVER, TMP_DIR, os.getpid())
-  print nodejsCommand
+  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s  --max_old_space_size=10240 --max_semi_space_size=2048 --max_path_length=%d >> %s/%d" % (f, original_features_flag, SERVER, MAX_PATH_LENGTH, TMP_DIR, os.getpid())
   #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
+  exit_code = call(command.split(' '))
+  if (exit_code != 0):
+	print "Evaluation failed for file %s" % f
+    sys.exit(exit_code)
   os.system(nodejsCommand)
 
 def EvaluateFileList(files):

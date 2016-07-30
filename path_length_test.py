@@ -44,7 +44,10 @@ if __name__ == '__main__':
   for max_length_candidate in path_lengths:
     command = "./extract_features.py --dir %s --max_path_length %d > training_data_%d" % (training_dir, max_length_candidate, max_length_candidate)
     print command
-    os.system(command)
+    exit_code = call(command.split(' '))
+    if (exit_code != 0):
+      print "Extract features failed for max path length = %d, exiting" % max_length_candidate
+      sys.exit(exit_code)
     
     os.chdir("../Nice2Predict")
     command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d -training_method pl -beam_size 16" % (num_threads, max_length_candidate)
@@ -68,10 +71,13 @@ if __name__ == '__main__':
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count())
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d --max_path_length %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count(), max_length_candidate)
       #command = "python ./evaluate_dir.py --dir %s --server %s" % (test_dir, server)
       print command
-      os.system(command)
+      exit_code = call(command.split(' '))
+      if (exit_code != 0):
+		print "Evaluation failed for max path length = %d, exiting" % max_length_candidate
+		sys.exit(exit_code)
     finally:
       server_process.send_signal(2)
       print "Nice2Server stopped"
@@ -80,14 +86,17 @@ if __name__ == '__main__':
   # Test original
   command = "./extract_features.py --dir %s --original_features > training_data_0" % (training_dir)
   print command
-  os.system(command)
+  exit_code = call(command.split(' '))
+  if (exit_code != 0):
+	print "Extract features failed for original UnuglifyJS, exiting"
+	sys.exit(exit_code)
   
   os.chdir("../Nice2Predict")
   command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0 -training_method pl -beam_size 16" % (num_threads)
   print command
   exit_code = call(command.split(' '))
   if (exit_code != 0):
-      print "Training faild for original features, exiting" 
+      print "Training failed for original features, exiting" 
       sys.exit(0)
 
   command = "./bin/server/nice2server"
@@ -104,10 +113,13 @@ if __name__ == '__main__':
         print 'Nice2Server started'
 
     os.chdir("../UnuglifyJS")
-    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d" % (test_dir, server, multiprocessing.cpu_count())
+    command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_0 --resultsfile results_0  --original_features --num_threads %d --max_path_length %d" % (test_dir, server, multiprocessing.cpu_count(), 0)
 
     print command
-    os.system(command)
+    exit_code = call(command.split(' '))
+    if (exit_code != 0):
+		print "Evaluation failed for original UnuglifyJS, exiting" 
+		sys.exit(exit_code)
   finally:
     server_process.send_signal(2)
     print "Nice2Server stopped"

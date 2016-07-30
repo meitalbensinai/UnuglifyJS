@@ -36,8 +36,11 @@ if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels")):
     nodejsFile = "unuglifyjs-labels.js"
 
 def ExtractFeaturesForFile(f):
-  command = "nodejs bin/%s --extract_features --max_path_length=%d --skip_minified '%s' %s %s >> %s/%d" % (nodejsFile, MAX_PATH_LENGTH, f, original_features, infer_labels, TMP_DIR, os.getpid())
-  os.system(command)
+  command = "nodejs bin/%s --extract_features --max_path_length=%d --skip_minified '%s' %s %s --max_old_space_size=10240 --max_semi_space_size=2048 >> %s/%d" % (nodejsFile, MAX_PATH_LENGTH, f, original_features, infer_labels, TMP_DIR, os.getpid())
+  exit_code = call(command.split(' '))
+  if (exit_code != 0):
+    print "Extracting features failed for file: %s" % f
+	sys.exit(exit_code)
 
 def ExtractFeaturesForFileList(files):
   global TMP_DIR
