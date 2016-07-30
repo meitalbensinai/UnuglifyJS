@@ -203,7 +203,7 @@ function processFile(file) {
     }
 
 	if (removeWhitespace(output) == '{"query":[],"assign":[]}') {
-		sys.error("WARN: ".yellow + " no features extracted '" + file + "'");
+		//sys.error("WARN: ".yellow + " no features extracted '" + file + "'");
 	} else {
 		//sys.error("OK: ".green + "'" + file + "'");
 	}

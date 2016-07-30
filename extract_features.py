@@ -31,7 +31,7 @@ else:
     original_features = "--original_features"
 infer_labels = ""
 nodejsFile = "unuglifyjs"
-if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels"):
+if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels")):
     infer_labels = "--infer_labels"
     nodejsFile = "unuglifyjs-labels.js"
 
