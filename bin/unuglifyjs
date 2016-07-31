@@ -202,14 +202,14 @@ function processFile(file) {
         throw e;
     }
 
-	if (removeWhitespace(output) == '{"query":[],"assign":[]}') {
+	/*if (removeWhitespace(output) == '{"query":[],"assign":[]}') {
 		//sys.error("WARN: ".yellow + " no features extracted '" + file + "'");
 	} else {
 		//sys.error("OK: ".green + "'" + file + "'");
-	}
+	}*/
 
 	if (ARGS.extract_features) {
-		if (removeWhitespace(output) != '{"query":[],"assign":[]}') {
+		if (output.length > '{"query":[],"assign":[]}'.length) {
 			console.log(output);
 		}
 
