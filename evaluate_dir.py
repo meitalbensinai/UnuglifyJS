@@ -5,6 +5,7 @@ import os
 import sys
 import shutil
 import re
+from subprocess import Popen,PIPE, STDOUT, call
 
 def PrintUsage():
   print """
@@ -47,10 +48,6 @@ def EvaluateFile(f):
   
   nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s  --max_old_space_size=10240 --max_semi_space_size=2048 --max_path_length=%d >> %s/%d" % (f, original_features_flag, SERVER, MAX_PATH_LENGTH, TMP_DIR, os.getpid())
   #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
-  exit_code = call(command.split(' '))
-  if (exit_code != 0):
-	print "Evaluation failed for file %s" % f
-    sys.exit(exit_code)
   os.system(nodejsCommand)
 
 def EvaluateFileList(files):

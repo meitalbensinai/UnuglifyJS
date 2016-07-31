@@ -4,6 +4,7 @@ import multiprocessing
 import os
 import sys
 import shutil
+from subprocess import Popen,PIPE, STDOUT, call
 
 def PrintUsage():
   print """
@@ -37,10 +38,7 @@ if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels")):
 
 def ExtractFeaturesForFile(f):
   command = "nodejs bin/%s --extract_features --max_path_length=%d --skip_minified '%s' %s %s --max_old_space_size=10240 --max_semi_space_size=2048 >> %s/%d" % (nodejsFile, MAX_PATH_LENGTH, f, original_features, infer_labels, TMP_DIR, os.getpid())
-  exit_code = call(command.split(' '))
-  if (exit_code != 0):
-    print "Extracting features failed for file: %s" % f
-	sys.exit(exit_code)
+  os.system(command)
 
 def ExtractFeaturesForFileList(files):
   global TMP_DIR

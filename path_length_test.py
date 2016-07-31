@@ -54,7 +54,7 @@ if __name__ == '__main__':
     print command
     exit_code = call(command.split(' '))
     if (exit_code != 0):
-      print "Training faild for max path length = %d, exiting" % max_length_candidate
+      print "Training failed for max path length = %d, exiting" % max_length_candidate
       sys.exit(0)
 
     command = "./bin/server/nice2server"
@@ -76,8 +76,8 @@ if __name__ == '__main__':
       print command
       exit_code = call(command.split(' '))
       if (exit_code != 0):
-		print "Evaluation failed for max path length = %d, exiting" % max_length_candidate
-		sys.exit(exit_code)
+        print "Evaluation failed for max path length = %d, exiting" % max_length_candidate
+        sys.exit(exit_code)
     finally:
       server_process.send_signal(2)
       print "Nice2Server stopped"
@@ -88,8 +88,8 @@ if __name__ == '__main__':
   print command
   exit_code = call(command.split(' '))
   if (exit_code != 0):
-	print "Extract features failed for original UnuglifyJS, exiting"
-	sys.exit(exit_code)
+    print "Extract features failed for original UnuglifyJS, exiting"
+    sys.exit(exit_code)
   
   os.chdir("../Nice2Predict")
   command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_0 -training_method pl -beam_size 16" % (num_threads)
@@ -118,8 +118,8 @@ if __name__ == '__main__':
     print command
     exit_code = call(command.split(' '))
     if (exit_code != 0):
-		print "Evaluation failed for original UnuglifyJS, exiting" 
-		sys.exit(exit_code)
+        print "Evaluation failed for original UnuglifyJS, exiting" 
+        sys.exit(exit_code)
   finally:
     server_process.send_signal(2)
     print "Nice2Server stopped"
