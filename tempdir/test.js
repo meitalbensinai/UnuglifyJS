@@ -1,10 +1,8 @@
-function countSomething(arr) {
-    var counter = 0;
-  	for (var i = 0; i< arr.length ; i++) {
-    	if (arr[i] == something) {
-      		counter++;
-    	}
+function foo() {
+	var done = false;
+	while (!done) {
+		if (1==2) {
+			done = true;
+		}
 	}
-  
-    return counter;
 }
