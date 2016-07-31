@@ -194,6 +194,7 @@ function processFile(file) {
 	if (!ARGS.nice_formatting) {
 		output = removeWhitespace(output);
 	}
+	global.gc();
 
 	//validate JSON
 	var features_result;
@@ -205,6 +206,7 @@ function processFile(file) {
     }
 
 	var original_features = JSON.parse(JSON.stringify(features_result));
+	global.gc();
 	if (ARGS.infer_labels) {
 		for (var i = 0, length = features_result.assign.length ; i < length; i++) {
 			var current = features_result.assign[i];
@@ -218,14 +220,14 @@ function processFile(file) {
 		output = JSON.stringify(features_result);
 	}
 
-	if (removeWhitespace(output) == '{"query":[],"assign":[]}') {
+	/*if (removeWhitespace(output) == '{"query":[],"assign":[]}') {
 		sys.error("WARN: ".yellow + " no features extracted '" + file + "'");
 	} else {
 		//sys.error("OK: ".green + "'" + file + "'");
-	}
+	}*/
 
 	if (ARGS.extract_features) {
-		if (removeWhitespace(output) != '{"query":[],"assign":[]}') {
+		if (output.length > '{"query":[],"assign":[]}'.length) {
 			console.log(output);
 		}
 
@@ -247,7 +249,11 @@ function processFile(file) {
 		}
 		var minified = UglifyJS.minify([file], {compress: false});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, false, ARGS.original_features, ARGS.features);
+		minified = null;
+		global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
+		minifiedFeaturesJson = null;
+		global.gc();
 
 		callServer(
 			HOST,

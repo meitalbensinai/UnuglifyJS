@@ -46,7 +46,7 @@ def EvaluateFile(f):
   if ((len(sys.argv) > 9) and (sys.argv[9] == '--original_features')):
       original_features_flag = '--original_features'
   
-  nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s  --max_old_space_size=10240 --max_semi_space_size=2048 --max_path_length=%d >> %s/%d" % (f, original_features_flag, SERVER, MAX_PATH_LENGTH, TMP_DIR, os.getpid())
+  nodejsCommand = "nodejs --max_old_space_size=64000 --expose-gc bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s --max_path_length=%d >> %s/%d" % (f, original_features_flag, SERVER, MAX_PATH_LENGTH, TMP_DIR, os.getpid())
   #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
   os.system(nodejsCommand)
 
