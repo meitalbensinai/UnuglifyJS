@@ -166,9 +166,9 @@ function processFile(file) {
 	}
 
 	try {
-		global.gc();
+		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.skip_minified, ARGS.original_features, ARGS.features);
-		global.gc();
+		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
 			sys.error("ERROR: ".red + "cannot parse file '" + file + "': " + ex.message);
@@ -218,7 +218,7 @@ function processFile(file) {
 		return;
 	}
 	output = null;
-	global.gc();
+	//global.gc();
 
 	if (ARGS.evaluate) {
 		var originalNames = [];
@@ -236,10 +236,10 @@ function processFile(file) {
 		var minified = UglifyJS.minify([file], {compress: false});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, false, ARGS.original_features, ARGS.features);
 		minified = null;
-		global.gc();
+		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
 		minifiedFeaturesJson = null;
-		global.gc();
+		//global.gc();
 
 		callServer(
 			HOST,
