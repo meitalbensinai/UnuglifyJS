@@ -32,21 +32,19 @@ MAX_PATH_LENGTH = 0
 if ((len(sys.argv) > 4) and (sys.argv[3] == "--max_path_length")):
     MAX_PATH_LENGTH = int(sys.argv[4])
 else:
-    original_features = " --original_features"
+    original_features = "--original_features"
 infer_labels = ""
 nodejsFile = "unuglifyjs"
-if ((len(sys.argv) > 5) and (sys.argv[5] == "--infer_labels")):
-    infer_labels = " --infer_labels"
-    nodejsFile = "unuglifyjs-labels.js"
 
 def ExtractFeaturesForFile(f):
-  command = "nodejs --max_old_space_size=64000 bin/%s %s --extract_features --max_path_length=%d --skip_minified%s" % (nodejsFile, f, MAX_PATH_LENGTH, original_features)
+  command = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--extract_features', '--max_path_length=' + str(MAX_PATH_LENGTH), '--skip_minified']
+  if (original_features != ""):
+	command.append(original_features)
   #os.system(command)
   kill = lambda process: process.kill()
-  cmd = command.split(' ')
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
-    sleeper = subprocess.Popen(cmd, stdout=outputFile, stderr=subprocess.PIPE)
-    timer = Timer(10, kill, [sleeper])
+    sleeper = subprocess.Popen(command, stdout=outputFile, stderr=subprocess.PIPE)
+    timer = Timer(60, kill, [sleeper])
 
     try:
       timer.start()
@@ -55,7 +53,8 @@ def ExtractFeaturesForFile(f):
       timer.cancel()
 
     if (sleeper.poll() == 0):
-      print >> sys.stderr, stderr,
+      if (len(stderr) > 0):
+        print >> sys.stderr, stderr,
     else:
       print >> sys.stderr, 'file: ' + str(f) + ' was not completed in time'
 
