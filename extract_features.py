@@ -53,7 +53,8 @@ def ExtractFeaturesForFile(f):
       timer.cancel()
 
     if (sleeper.poll() == 0):
-      print >> sys.stderr, stderr,
+      if (len(stderr) > 0):
+        print >> sys.stderr, stderr,
     else:
       print >> sys.stderr, 'file: ' + str(f) + ' was not completed in time'
 
