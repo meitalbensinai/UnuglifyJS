@@ -5,6 +5,8 @@ import os
 import sys
 import shutil
 import re
+from threading import Timer
+import subprocess
 from subprocess import Popen,PIPE, STDOUT, call
 
 def PrintUsage():
@@ -40,21 +42,36 @@ if (len(sys.argv) > 13):
 LOGFILE = sys.argv[6]
 RESULTSFILE = sys.argv[8]
 
+original_features_flag = ""
+if ((len(sys.argv) > 9) and (sys.argv[9] == '--original_features')):
+  original_features_flag = '--original_features'
+
 def EvaluateFile(f):
-  global TMP_DIR
-  original_features_flag = ""
-  if ((len(sys.argv) > 9) and (sys.argv[9] == '--original_features')):
-      original_features_flag = '--original_features'
+  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH)]
+  if (original_features_flag != ""):
+	nodejsCommand.append(original_features_flag)
   
-  nodejsCommand = "nodejs --max_old_space_size=64000 bin/unuglifyjs '%s' --evaluate %s --nice2predict_server=%s --max_path_length=%d >> %s/%d" % (f, original_features_flag, SERVER, MAX_PATH_LENGTH, TMP_DIR, os.getpid())
-  #nodejsCommand = "nodejs bin/unuglifyjs '%s' --evaluate --nice2predict_server=%s" % (f, SERVER)
-  #print nodejsCommand
-  os.system(nodejsCommand)
+  kill = lambda process: process.kill()
+  with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
+    sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
+    timer = Timer(120, kill, [sleeper])
+
+    try:
+      timer.start()
+      stdout, stderr = sleeper.communicate()
+    finally:
+      timer.cancel()
+
+    if (sleeper.poll() == 0):
+      if (len(stderr) > 0):
+        print >> sys.stderr, stderr,
+    else:
+      print >> sys.stderr, 'file: ' + str(f) + ' was not completed in time'
 
 def EvaluateFileList(files):
   global TMP_DIR
   resultRegex = re.compile('^\d* \d*$')
-  TMP_DIR = "./tmp/evaluate_dir%d" % (os.getpid())
+  TMP_DIR = "./tmp/evaluate_dir%d/" % (os.getpid())
   if os.path.exists(TMP_DIR):
     shutil.rmtree(TMP_DIR)
   os.makedirs(TMP_DIR)
@@ -62,6 +79,7 @@ def EvaluateFileList(files):
     p = multiprocessing.Pool(NUM_THREADS)
     p.map(EvaluateFile, files)
     output_files = os.listdir(TMP_DIR)
+    print output_files
     correct_predictions = 0
     total_predictions = 0
     
