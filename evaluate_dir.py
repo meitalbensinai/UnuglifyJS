@@ -12,7 +12,7 @@ from subprocess import Popen,PIPE, STDOUT, call
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] --num_threads <number> --max_path_length <number>
+  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] --num_threads <number> --max_path_length <number>  --max_path_width <number> --no-timeout
 """
   exit(1)
 
@@ -38,6 +38,10 @@ if (len(sys.argv) > 11):
 MAX_PATH_LENGTH = 0
 if (len(sys.argv) > 13):
 	MAX_PATH_LENGTH = int(sys.argv[13])
+
+MAX_PATH_WIDTH = 0
+if (len(sys.argv) > 15):
+	MAX_PATH_WIDTH = int(sys.argv[15])
   
 LOGFILE = sys.argv[6]
 RESULTSFILE = sys.argv[8]
@@ -45,16 +49,22 @@ RESULTSFILE = sys.argv[8]
 original_features_flag = ""
 if ((len(sys.argv) > 9) and (sys.argv[9] == '--original_features')):
   original_features_flag = '--original_features'
+  
+kill = lambda process: process.kill()
+if (len(sys.argv) > 16):
+	if (sys.argv[16] == '--no-timeout'):
+		kill = lambda process: 1
+
 
 def EvaluateFile(f):
-  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH)]
+  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH)]
   if (original_features_flag != ""):
 	nodejsCommand.append(original_features_flag)
   
-  kill = lambda process: process.kill()
+  
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
-    timer = Timer(120, kill, [sleeper])
+    timer = Timer(300, kill, [sleeper])
 
     try:
       timer.start()

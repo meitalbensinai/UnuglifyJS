@@ -12,9 +12,9 @@ from subprocess import Popen,PIPE, STDOUT, call
 def PrintUsage():
   print """
 Usage:
-  extract_features.py --filelist <file> --max_path_length <number>
+  extract_features.py --filelist <file> --max_path_length <number> --max_path_width <number>
 OR
-  extract_features.py --dir <directory> --max_path_length <number> [--infer_labels]
+  extract_features.py --dir <directory> --max_path_length <number> --max_path_width <number>
 """
   exit(1)
 
@@ -33,11 +33,13 @@ if ((len(sys.argv) > 4) and (sys.argv[3] == "--max_path_length")):
     MAX_PATH_LENGTH = int(sys.argv[4])
 else:
     original_features = "--original_features"
-infer_labels = ""
-nodejsFile = "unuglifyjs"
+
+MAX_PATH_WIDTH = 0
+if ((len(sys.argv) > 6) and (sys.argv[5] == "--max_path_width")):
+	MAX_PATH_WIDTH = int(sys.argv[6])
 
 def ExtractFeaturesForFile(f):
-  command = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--extract_features', '--max_path_length=' + str(MAX_PATH_LENGTH), '--skip_minified']
+  command = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--extract_features', '--max_path_length=' + str(MAX_PATH_LENGTH), '--skip_minified', '--max_path_width=' +str(MAX_PATH_WIDTH)]
   if (original_features != ""):
 	command.append(original_features)
   #os.system(command)

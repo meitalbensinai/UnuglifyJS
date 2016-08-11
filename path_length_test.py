@@ -10,7 +10,7 @@ import time
 def PrintUsage():
   print """
 Usage:
-  path_length_test.py --training_dir <directory> --test_dir <directory> --nice2predict_server <server> --path_lengths <comma-separated-list> --num_threads <number>
+  path_length_test.py --training_dir <directory> --test_dir <directory> --nice2predict_server <server> --path_lengths <comma-separated-list> --num_threads <number> --path_width <number>
 """
   exit(1)
 
@@ -39,10 +39,13 @@ if __name__ == '__main__':
   num_threads = 1
   if ((len(sys.argv) > 10) and sys.argv[9] == '--num_threads'):
     num_threads = int(sys.argv[10])
+  path_width = 0;
+  if ((len(sys.argv) > 12) and sys.argv[11] == '--path_width'):
+    path_width = int(sys.argv[12])
   
   #EvaluateFileList(files)
   for max_length_candidate in path_lengths:
-    command = "./extract_features.py --dir %s --max_path_length %d > training_data_%d" % (training_dir, max_length_candidate, max_length_candidate)
+    command = "./extract_features.py --dir %s --max_path_length %d --max_path_width %d > training_data_%d" % (training_dir, max_length_candidate, path_width, max_length_candidate)
     print command
     os.system(command)
     
@@ -68,8 +71,7 @@ if __name__ == '__main__':
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d --max_path_length %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count(), max_length_candidate)
-      #command = "python ./evaluate_dir.py --dir %s --server %s" % (test_dir, server)
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d --max_path_length %d --max_path_width %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count(), max_length_candidate, path_width)
       print command
       os.system(command)
     finally:
@@ -78,7 +80,7 @@ if __name__ == '__main__':
 
 
   # Test original
-  command = "./extract_features.py --dir %s --original_features > training_data_0" % (training_dir)
+  '''command = "./extract_features.py --dir %s --original_features > training_data_0" % (training_dir)
   print command
   os.system(command)
   
@@ -111,12 +113,14 @@ if __name__ == '__main__':
   finally:
     server_process.send_signal(2)
     print "Nice2Server stopped"
+'''
 
+  print("Max path width=%d" % (path_width))
   for max_length_candidate in path_lengths:
     with open("results_%d" % (max_length_candidate), "r") as resultsFile:
       line = resultsFile.readline().strip()
     print("MAX PATH LENGTH=%d: %s" % (max_length_candidate, line))
   with open("results_0", "r") as resultsFile:
       line = resultsFile.readline().strip()
-  print("ORIGINAL UnuglifyJS: %s" % line)
+  #print("ORIGINAL UnuglifyJS: %s" % line)
 
