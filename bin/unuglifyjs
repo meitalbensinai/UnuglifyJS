@@ -26,12 +26,14 @@ var ARGS = yargs
 	.describe("colored", "Add colors to the output")
 	.describe("V", "Print version number and exit.")
 	.describe("max_path_length", "The Maximum path length between literals to generate a feature")
+	.describe("max_path_width", "The maximum path width between literals to generate a feature")
 	//.demand(1)
 	.alias("V", "version")
 	.default('features', 'ASTREL,FNAMES,FSCOPE')
 	.default('nice2predict_server', 'www.nice2predict.org:5745')
 	.default('rename', true)
 	.default('max_path_length', 10)
+	.default('max_path_width', 10)
 	.default('evaluate', false)
 	.default('original_features', false)
 	.boolean("rename")
@@ -45,6 +47,7 @@ var ARGS = yargs
 	.boolean("V")
 	.boolean("colors")
 	.string('max_path_length')
+	.string('max_path_width')
 	.string("features")
 	.string("nice2predict_server")
 	.wrap(80)
@@ -167,7 +170,7 @@ function processFile(file) {
 
 	try {
 		//global.gc();
-		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.skip_minified, ARGS.original_features, ARGS.features);
+		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, ARGS.skip_minified, ARGS.original_features, ARGS.features);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -234,7 +237,7 @@ function processFile(file) {
 			originalNames[originalId] = originalName;
 		}
 		var minified = UglifyJS.minify([file], {compress: false});
-		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, false, ARGS.original_features, ARGS.features);
+		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, false, ARGS.original_features, ARGS.features);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
@@ -300,7 +303,7 @@ function processFile(file) {
 						}
 					}
 					try {
-						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names, ARGS.max_path_length, ARGS.original_features);
+						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names, ARGS.max_path_length, ARGS.max_path_width, ARGS.original_features);
 						console.log(renamed_js);
 					} catch (ex) {
 						sys.error("ERROR: ".red + "failed rename '" + file + "': " + ex);
