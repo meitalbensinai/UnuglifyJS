@@ -36,10 +36,12 @@ var ARGS = yargs
 	.default('max_path_width', 10)
 	.default('evaluate', false)
 	.default('original_features', false)
+	.default('show_graph', false)
 	.boolean("rename")
 	.boolean('extract_features')
 	.boolean('original_features')
 	.boolean('evaluate')
+	.boolean('show_graph')
 	.boolean("print_ast")
 	.boolean("skip_minified")
 	.boolean("nice_formatting")
@@ -109,7 +111,7 @@ var HOST = ARGS.nice2predict_server.split(":")[0];
 var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 
 //make only one mode active
-if (ARGS.extract_features || ARGS.evaluate){
+if (ARGS.extract_features || ARGS.evaluate || ARGS.show_graph){
 	ARGS.rename = false;
 }
 
@@ -308,6 +310,48 @@ function processFile(file) {
 					} catch (ex) {
 						sys.error("ERROR: ".red + "failed rename '" + file + "': " + ex);
 					}
+				} else {
+					sys.error("ERROR: ".red + "undefined response. Try to update unuglify-js to the latest version by 'npm update -g unuglify-js'");
+				}
+
+			},
+			function(err) {
+				sys.error("ERROR: ".red + "connecting to server '" + HOST + ":" + PORT + "' " + err);
+			});
+		return;
+	}
+	if (ARGS.show_graph){
+		callServer(
+			HOST,
+			PORT,
+			"showgraph",
+			features_result,
+			function(data) {
+				var data_json = JSON.parse(data);
+				if (data_json.hasOwnProperty('error')){
+					console.log("ERROR: ".red + data_json.error.message);
+				}
+				else if (data_json.hasOwnProperty('result')) {
+					var result = data_json.result;
+					var nodes = result.nodes;
+					var edges = result.edges;
+					var totalScore = 0;
+					for (var i = 0, edgesLength = edges.length; i < edgesLength; i++) {
+						var edge = edges[i];
+						var allRelations = edge.label.split(', ');
+						for (var j = 0, numOfRelations = allRelations.length; j < numOfRelations ; j++) {
+							var composedLabel = allRelations[j].split(' - ');
+							var feature = composedLabel[0];
+							var score = composedLabel[1];
+							var sourceId = edge.source.substring(1);
+							var targetId = edge.target.substring(1);
+							var sourceLabel = nodes[sourceId].label;
+							var targetLabel = nodes[targetId].label;
+							totalScore += parseFloat(score);
+							console.log(sourceLabel + " - " + feature + " - " + targetLabel + " : " + score);
+						}
+					}
+					console.log("Total score: " + totalScore);
 				} else {
 					sys.error("ERROR: ".red + "undefined response. Try to update unuglify-js to the latest version by 'npm update -g unuglify-js'");
 				}
