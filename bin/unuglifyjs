@@ -142,6 +142,10 @@ for (var i = 0; i < files.length; i++) {
 }
 
 var reverseHash = {};
+function getReverseHash(hash) {
+	return reverseHash[hash];
+}
+
 function processFile(file) {
 	reverseHash = {};
 	var code;
@@ -383,7 +387,7 @@ function processFile(file) {
 							var sourceLabel = nodes[sourceId].label;
 							var targetLabel = nodes[targetId].label;
 							totalScore += parseFloat(score);
-							console.log(sourceLabel + " - \t" + reverseHash(feature) + " - " + targetLabel + " : " + score);
+							console.log(sourceLabel + " - \t" + getReverseHash(feature) + " - " + targetLabel + " : " + score);
 						}
 					}
 					console.log("Total score: " + totalScore);
