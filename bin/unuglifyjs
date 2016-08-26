@@ -37,6 +37,8 @@ var ARGS = yargs
 	.default('evaluate', false)
 	.default('original_features', false)
 	.default('show_graph', false)
+	.default('hash', true)
+	.boolean('hash')
 	.boolean("rename")
 	.boolean('extract_features')
 	.boolean('original_features')
@@ -139,8 +141,41 @@ for (var i = 0; i < files.length; i++) {
 	processFile(files[i]);
 }
 
+var reverseHash = {};
 function processFile(file) {
+	reverseHash = {};
 	var code;
+	var hashCode;
+	if (ARGS.show_graph) {
+		if (ARGS.hash) {
+			hashCode = function (str) {
+				var hash = str.split('').reduce(function (prevHash, currVal) { 	return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0); }, 0);
+				//var hash = str;
+				reverseHash[hash] = str;
+				return hash;
+			}
+		} else {
+			hashCode = function (str) {
+				//var hash = str.split('').reduce(function (prevHash, currVal) { 	return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0); }, 0);
+				var hash = str;
+				reverseHash[hash] = str;
+				return hash;
+			}
+		}
+	} else {
+		if (ARGS.hash) {
+			hashCode = function (str) {
+				return str.split('').reduce(function (prevHash, currVal) {
+					return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);
+				}, 0);
+				//return str;
+			}
+		} else {
+			hashCode = function (str) {
+				return str;
+			}
+		}
+	}
 	try {
 		code = fs.readFileSync(file, "utf-8");
 	}
@@ -172,7 +207,7 @@ function processFile(file) {
 
 	try {
 		//global.gc();
-		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, ARGS.skip_minified, ARGS.original_features, ARGS.features);
+		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, ARGS.skip_minified, ARGS.original_features, ARGS.features, hashCode);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -239,7 +274,7 @@ function processFile(file) {
 			originalNames[originalId] = originalName;
 		}
 		var minified = UglifyJS.minify([file], {compress: false});
-		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, false, ARGS.original_features, ARGS.features);
+		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hashCode);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
@@ -348,7 +383,7 @@ function processFile(file) {
 							var sourceLabel = nodes[sourceId].label;
 							var targetLabel = nodes[targetId].label;
 							totalScore += parseFloat(score);
-							console.log(sourceLabel + " - " + feature + " - " + targetLabel + " : " + score);
+							console.log(sourceLabel + " - \t" + reverseHash(feature) + " - " + targetLabel + " : " + score);
 						}
 					}
 					console.log("Total score: " + totalScore);
