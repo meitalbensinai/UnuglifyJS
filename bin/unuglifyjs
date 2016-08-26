@@ -37,8 +37,6 @@ var ARGS = yargs
 	.default('evaluate', false)
 	.default('original_features', false)
 	.default('show_graph', false)
-	.default('nohash', false)
-	.boolean('nohash')
 	.boolean("rename")
 	.boolean('extract_features')
 	.boolean('original_features')
@@ -141,45 +139,21 @@ for (var i = 0; i < files.length; i++) {
 	processFile(files[i]);
 }
 
-var reverseHash = {};
-function getReverseHash(hash) {
-	return reverseHash[hash];
+function hashCode(str) {
+	//var hash = str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
+	var hash = str;
+	return hash;
 }
 
+/*function hashCode(str) {
+	var hash = str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
+	//var hash = str;
+	//global.reverseHash[hash] = str;
+	return hash;
+}*/
+
 function processFile(file) {
-	reverseHash = {};
 	var code;
-	var hashCode;
-	if (ARGS.show_graph) {
-		if (!ARGS.nohash) {
-			hashCode = function (str) {
-				var hash = str.split('').reduce(function (prevHash, currVal) { 	return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0); }, 0);
-				//var hash = str;
-				reverseHash[hash] = str;
-				return hash;
-			}
-		} else {
-			hashCode = function (str) {
-				//var hash = str.split('').reduce(function (prevHash, currVal) { 	return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0); }, 0);
-				var hash = str;
-				reverseHash[hash] = str;
-				return hash;
-			}
-		}
-	} else {
-		if (!ARGS.nohash) {
-			hashCode = function (str) {
-				return str.split('').reduce(function (prevHash, currVal) {
-					return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);
-				}, 0);
-				//return str;
-			}
-		} else {
-			hashCode = function (str) {
-				return str;
-			}
-		}
-	}
 	try {
 		code = fs.readFileSync(file, "utf-8");
 	}
@@ -387,7 +361,7 @@ function processFile(file) {
 							var sourceLabel = nodes[sourceId].label;
 							var targetLabel = nodes[targetId].label;
 							totalScore += parseFloat(score);
-							console.log(sourceLabel + " - \t" + getReverseHash(feature) + " - " + targetLabel + " : " + score);
+							console.log(sourceLabel + " - \t" + feature + " - " + targetLabel + " : " + score);
 						}
 					}
 					console.log("Total score: " + totalScore);
