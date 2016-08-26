@@ -139,19 +139,6 @@ for (var i = 0; i < files.length; i++) {
 	processFile(files[i]);
 }
 
-function hashCode(str) {
-	//var hash = str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
-	var hash = str;
-	return hash;
-}
-
-/*function hashCode(str) {
-	var hash = str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
-	//var hash = str;
-	//global.reverseHash[hash] = str;
-	return hash;
-}*/
-
 function processFile(file) {
 	var code;
 	try {
@@ -185,7 +172,7 @@ function processFile(file) {
 
 	try {
 		//global.gc();
-		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, ARGS.skip_minified, ARGS.original_features, ARGS.features, hashCode);
+		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, ARGS.skip_minified, ARGS.original_features, ARGS.features);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -252,7 +239,7 @@ function processFile(file) {
 			originalNames[originalId] = originalName;
 		}
 		var minified = UglifyJS.minify([file], {compress: false});
-		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hashCode);
+		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width, false, ARGS.original_features, ARGS.features);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
