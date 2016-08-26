@@ -37,8 +37,8 @@ var ARGS = yargs
 	.default('evaluate', false)
 	.default('original_features', false)
 	.default('show_graph', false)
-	.default('hash', true)
-	.boolean('hash')
+	.default('nohash', false)
+	.boolean('nohash')
 	.boolean("rename")
 	.boolean('extract_features')
 	.boolean('original_features')
@@ -147,7 +147,7 @@ function processFile(file) {
 	var code;
 	var hashCode;
 	if (ARGS.show_graph) {
-		if (ARGS.hash) {
+		if (!ARGS.nohash) {
 			hashCode = function (str) {
 				var hash = str.split('').reduce(function (prevHash, currVal) { 	return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0); }, 0);
 				//var hash = str;
@@ -163,7 +163,7 @@ function processFile(file) {
 			}
 		}
 	} else {
-		if (ARGS.hash) {
+		if (!ARGS.nohash) {
 			hashCode = function (str) {
 				return str.split('').reduce(function (prevHash, currVal) {
 					return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);
