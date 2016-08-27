@@ -376,7 +376,7 @@ function processFile(file) {
 							var sourceLabel = nodes[sourceId].label;
 							var targetLabel = nodes[targetId].label;
 							totalScore += parseFloat(score);
-							console.log(sourceLabel + " - \t" + feature + " - " + targetLabel + " : " + score);
+							console.log(sourceLabel + " - \t" + hasher.reverseHash[feature] + " - " + targetLabel + " : " + score);
 						}
 					}
 					console.log("Total score: " + totalScore);
