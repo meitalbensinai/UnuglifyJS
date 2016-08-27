@@ -71,6 +71,7 @@ function Hasher(shouldHash, saveReverseMapping) {
 		this.hashCode = function (str) {
 			var hash = str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
 			this.reverseHash[hash] = str;
+			return hash;
 		}
 	} else if (shouldHash && !saveReverseMapping) {
 		this.hashCode = function (str) {
@@ -80,6 +81,7 @@ function Hasher(shouldHash, saveReverseMapping) {
 		this.hashCode = function (str) {
 			var hash = str;
 			this.reverseHash[hash] = str;
+			return hash;
 		}
 	} else if (!shouldHash && !saveReverseMapping) {
 		this.hashCode = function (str) {
