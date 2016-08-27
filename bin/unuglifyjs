@@ -199,7 +199,7 @@ function processFile(file) {
 	try {
 		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width,
-			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher.hashCode);
+			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -267,7 +267,7 @@ function processFile(file) {
 		}
 		var minified = UglifyJS.minify([file], {compress: false});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
-			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher.hashCode);
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
@@ -333,7 +333,7 @@ function processFile(file) {
 						}
 					}
 					try {
-						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names, ARGS.max_path_length, ARGS.max_path_width, ARGS.original_features, hasher.hashCode);
+						var renamed_js = UglifyJS.replaceMangled(code, file, inferred_names, ARGS.max_path_length, ARGS.max_path_width, ARGS.original_features, hasher);
 						console.log(renamed_js);
 					} catch (ex) {
 						sys.error("ERROR: ".red + "failed rename '" + file + "': " + ex);
