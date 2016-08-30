@@ -50,7 +50,7 @@ if __name__ == '__main__':
     os.system(command)
     
     os.chdir("../Nice2Predict")
-    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d -training_method pl -beam_size 16" % (num_threads, max_length_candidate)
+    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d -training_method pl" % (num_threads, max_length_candidate)
     print command
     exit_code = call(command.split(' '))
     if (exit_code != 0):
