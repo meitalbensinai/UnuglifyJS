@@ -113,6 +113,7 @@ def EvaluateFileList(files):
               logFile.write(message + "\n")
     final_sum = "%s / %s" % (correct_predictions, total_predictions)
     print final_sum
+    #print float(correct_predictions)/total_predictions
     with open(LOGFILE, "a") as logFile:
       logFile.write(final_sum + "\n")
     with open(RESULTSFILE, "a") as resultsFile:

@@ -64,7 +64,7 @@ def ExtractFeaturesForFileList(files):
   global TMP_DIR
   TMP_DIR = "./tmp/feature_extractor%d/" % (os.getpid())
   if os.path.exists(TMP_DIR):
-    shutil.rmtree(TMP_DIR)
+    shutil.rmtree(TMP_DIR, ignore_errors=True)
   os.makedirs(TMP_DIR)
   try:
     p = multiprocessing.Pool(multiprocessing.cpu_count())
@@ -73,7 +73,7 @@ def ExtractFeaturesForFileList(files):
     for f in output_files:
       os.system("cat %s/%s" % (TMP_DIR, f))
   finally:
-    shutil.rmtree(TMP_DIR)
+    shutil.rmtree(TMP_DIR, ignore_errors=True)
 
 
 if __name__ == '__main__':
