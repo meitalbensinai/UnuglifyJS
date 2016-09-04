@@ -24,7 +24,7 @@ def calculateFilePrecision(evaluation_log):
     with open(evaluation_log, "r") as open_evaluation_log:
         for line in open_evaluation_log:
             stripped_line = line.rstrip('\n')
-            if (stripped_line.startswith(".")):
+            if (stripped_line.startswith(".") or stripped_line.startswith("/home")):
                 if ((current_file) != "" and (total > 0)):
                     file_precision[current_file] = float(correct) / total
                     correct = 0
@@ -51,7 +51,7 @@ def processByFilename(histogram, file_precision):
 def processByMd5(histogram, file_precision):
     result = []
     for full_filename, precision in file_precision.iteritems():
-        md5 = hashlib.md5(open(full_filename[3:], 'rb').read()).hexdigest()
+        md5 = hashlib.md5(open(full_filename, 'rb').read()).hexdigest()
         if (md5 in histogram):
             appearances = histogram[md5]
         else:
