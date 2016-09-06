@@ -1,4 +1,8 @@
-function f(a,b,c) {
-  b.open('GET', a, false);
-  b.send(c);
+function g() {
+	var d = false;
+	while (!d) {
+		if (someCondition()) {
+			d = true;
+		}
+	}
 }
