@@ -426,8 +426,8 @@ function processFile(file) {
 							var originalName = originalNames[nodeId];
 							var candidatesForNode = candidates.result[i].candidates;
 							var rank = getCorrectPredictionRank(candidatesForNode, originalName);
-							console.log("Rank for var '" + originalName + "': " + rank);
-							//console.log(rank);
+							//console.log("Rank for var '" + originalName + "': " + rank);
+							console.log(rank);
 						}
 					},
 					function(err) {

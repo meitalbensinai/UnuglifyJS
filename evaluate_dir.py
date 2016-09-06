@@ -137,6 +137,6 @@ if __name__ == '__main__':
   else:
     PrintUsage()
   # Remove files that say they are minified.
-  files = [f for f in files if not f.endswith('.min.js')]
+  files = [f for f in files if (not f.endswith('.min.js') and not f.endswith("-min.js"))]
   EvaluateFileList(files)
 
