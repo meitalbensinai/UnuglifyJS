@@ -51,12 +51,12 @@ def processByFilename(histogram, file_precision):
 def processByMd5(histogram, file_precision):
     result = []
     for full_filename, precision in file_precision.iteritems():
-        md5 = hashlib.md5(open(full_filename[3:], 'rb').read()).hexdigest()
+        md5 = hashlib.md5(open(full_filename, 'rb').read()).hexdigest()
         if (md5 in histogram):
             appearances = histogram[md5]
         else:
             appearances = 0
-        result.append((full_filename[3:], appearances, precision))
+        result.append((full_filename, appearances, precision))
     return result
 
 if __name__ == '__main__':
