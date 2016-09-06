@@ -35,6 +35,7 @@ var ARGS = yargs
 	.default('max_path_length', 10)
 	.default('max_path_width', 10)
 	.default('evaluate', false)
+	.default('topk', 0)
 	.default('original_features', false)
 	.default('show_graph', false)
 	.default('no_hash', false)
@@ -54,6 +55,7 @@ var ARGS = yargs
 	.string('max_path_width')
 	.string("features")
 	.string("nice2predict_server")
+	.string("topk")
 	.wrap(80)
 	.check(function(argv, options){
 		if (argv._.length == 0 && !argv.package && !argv.version){
@@ -138,7 +140,7 @@ var HOST = ARGS.nice2predict_server.split(":")[0];
 var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 
 //make only one mode active
-if (ARGS.extract_features || ARGS.evaluate || ARGS.show_graph){
+if (ARGS.extract_features || ARGS.evaluate || ARGS.show_graph || ARGS.topk){
 	ARGS.rename = false;
 }
 
@@ -255,18 +257,7 @@ function processFile(file) {
 	//global.gc();
 
 	if (ARGS.evaluate) {
-		var originalNames = [];
-		for (var i=0 ; i< features_result.assign.length ; i++) {
-			var currentAssignItem = features_result.assign[i];
-			var originalId = currentAssignItem.v;
-			var originalName;
-			if (currentAssignItem.hasOwnProperty("inf")) {
-				originalName = currentAssignItem.inf;
-			} else {
-				originalName = currentAssignItem.giv;
-			}
-			originalNames[originalId] = originalName;
-		}
+		var originalNames = getQueryNames(features_result);
 		var minified = UglifyJS.minify([file], {compress: false});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
@@ -392,6 +383,64 @@ function processFile(file) {
 			});
 		return;
 	}
+	if (ARGS.topk > 0) {
+		var originalNames = getQueryNames(features_result);
+		var minified = UglifyJS.minify([file], {compress: false});
+		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
+		minified = null;
+		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
+		minifiedFeaturesJson = null;
+
+		callServer(
+			HOST,
+			PORT,
+			"infer",
+			minifiedFeatures,
+			function(data) {
+				var data_json = JSON.parse(data);
+				if (data_json.hasOwnProperty('error')){
+					console.log("ERROR: ".red + data_json.error.message);
+				}
+				else if (data_json.hasOwnProperty('result')) {
+					var result = data_json.result;
+					var renamedQuery = features_result;
+					for (var i = 0; i < result.length; i++) {
+						if (result[i].hasOwnProperty("inf")) {
+							renamedQuery.assign[result[i].v].inf = UglifyJS.unescapeString(result[i].inf).green;
+						}
+					}
+				} else {
+					sys.error("ERROR: ".red + "undefined response. Try to update unuglify-js to the latest version by 'npm update -g unuglify-js'");
+				}
+				renamedQuery["n"] = Number(ARGS.topk);
+				callServer(
+					HOST,
+					PORT,
+					"nbest",
+					renamedQuery,
+					function(candidatesData) {
+						var candidates = JSON.parse(candidatesData);
+						for (var i = 0, len = candidates.result.length; i < len ; i++) {
+							var nodeId = candidates.result[i].node;
+							var originalName = originalNames[nodeId];
+							var candidatesForNode = candidates.result[i].candidates;
+							var rank = getCorrectPredictionRank(candidatesForNode, originalName);
+							//console.log("Rank for var '" + originalName + "': " + rank);
+							console.log(rank);
+						}
+					},
+					function(err) {
+						sys.error("ERROR: ".red + "sending 'nbest' request: " + err)
+					}
+				);
+			},
+			function(err) {
+				sys.error("ERROR: ".red + "connecting to server '" + HOST + ":" + PORT + "' " + err);
+			}
+		);
+		return;
+	}
 }
 
 if (ARGS.package){
@@ -412,6 +461,31 @@ if (ARGS.package){
 	output = output.get();
 
 	sys.print(output);
+}
+
+function getQueryNames(features_result) {
+	var names = [];
+	for (var i=0 ; i< features_result.assign.length ; i++) {
+		var currentAssignItem = features_result.assign[i];
+		var originalId = currentAssignItem.v;
+		var name;
+		if (currentAssignItem.hasOwnProperty("inf")) {
+			name = currentAssignItem.inf;
+		} else {
+			name = currentAssignItem.giv;
+		}
+		names[originalId] = name;
+	}
+	return names;
+}
+
+function getCorrectPredictionRank(candidates, correctName) {
+	for (var i = 0, len = candidates.length ; i < len ; i++) {
+		if (correctName.toLowerCase() === candidates[i].candidate.toLowerCase()) {
+			return i + 1;
+		}
+	}
+	return -1;
 }
 
 function callServer(server, port, methodName, params, success_cb, error_cb) {
