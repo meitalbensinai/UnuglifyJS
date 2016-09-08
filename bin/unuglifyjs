@@ -258,7 +258,7 @@ function processFile(file) {
 
 	if (ARGS.evaluate) {
 		var originalNames = getQueryNames(features_result);
-		var minified = UglifyJS.minify([file], {compress: false, mangle: false});
+		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: true}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
 		minified = null;
@@ -385,7 +385,7 @@ function processFile(file) {
 	}
 	if (ARGS.topk > 0) {
 		var originalNames = getQueryNames(features_result);
-		var minified = UglifyJS.minify([file], {compress: false, mangle: false});
+		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: true}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
 		minified = null;
