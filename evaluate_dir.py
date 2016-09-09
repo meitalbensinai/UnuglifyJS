@@ -57,11 +57,11 @@ if (len(sys.argv) > 16):
 
 
 def EvaluateFile(f):
-  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH)]
+  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH), '--skip_minified']
   if (original_features_flag != ""):
 	nodejsCommand.append(original_features_flag)
   
-  
+  #print " ".join(nodejsCommand)
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
     timer = Timer(300, kill, [sleeper])
@@ -113,6 +113,7 @@ def EvaluateFileList(files):
               logFile.write(message + "\n")
     final_sum = "%s / %s" % (correct_predictions, total_predictions)
     print final_sum
+    print float(correct_predictions)/total_predictions
     #print float(correct_predictions)/total_predictions
     with open(LOGFILE, "a") as logFile:
       logFile.write(final_sum + "\n")
