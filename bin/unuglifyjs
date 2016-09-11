@@ -39,6 +39,8 @@ var ARGS = yargs
 	.default('original_features', false)
 	.default('show_graph', false)
 	.default('no_hash', false)
+	.default("print_candidates", false)
+	.boolean("print_candidates")
 	.boolean("no_hash")
 	.boolean("rename")
 	.boolean('extract_features')
@@ -425,6 +427,12 @@ function processFile(file) {
 							var nodeId = candidates.result[i].node;
 							var originalName = originalNames[nodeId];
 							var candidatesForNode = candidates.result[i].candidates;
+							if (ARGS.print_candidates) {
+								console.log(originalName + ":");
+								for (var j = 0; j< candidatesForNode.length ; j++) {
+									console.log("\t" + candidatesForNode[j].candidate);
+								}
+							}
 							var rank = getCorrectPredictionRank(candidatesForNode, originalName);
 							//console.log("Rank for var '" + originalName + "': " + rank);
 							console.log(rank);
