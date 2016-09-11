@@ -59,7 +59,7 @@ if (len(sys.argv) > 16):
 topk = sys.argv[18]
 
 def EvaluateFile(f):
-  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--topk=' + str(topk), '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH)]
+  nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--topk=' + str(topk), '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH), '--skip_minified']
   
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
@@ -102,7 +102,7 @@ def EvaluateFileList(files):
               among_topk += 1
     
     print str(among_topk) + " / " + str(total_predictions)
-    #print float(among_topk)/total_predictions
+    print float(among_topk)/total_predictions
 
     with open(RESULTSFILE, "a") as resultsFile:
       resultsFile.write(str(among_topk) + " / " + str(total_predictions) + "\n")
