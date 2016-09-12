@@ -291,7 +291,7 @@ function processFile(file) {
 							var inferredName = result[i].inf;
 							var originalName = originalNames[id];
 							var label = "error";
-							if (inferredName === originalName) {
+							if (stripName(originalName) === stripName(inferredName)) {
 								correctly_inferred_names++;
 								label = "ok";
                             }
@@ -471,6 +471,10 @@ if (ARGS.package){
 	sys.print(output);
 }
 
+function stripName(originalName) {
+	return originalName.toLowerCase().replace(/[^A-Za-z]/g, '');
+}
+
 function getQueryNames(features_result) {
 	var names = [];
 	for (var i=0 ; i< features_result.assign.length ; i++) {
@@ -489,7 +493,7 @@ function getQueryNames(features_result) {
 
 function getCorrectPredictionRank(candidates, correctName) {
 	for (var i = 0, len = candidates.length ; i < len ; i++) {
-		if (correctName.toLowerCase() === candidates[i].candidate.toLowerCase()) {
+		if (stripName(correctName) === stripName(candidates[i].candidate)) {
 			return i + 1;
 		}
 	}
