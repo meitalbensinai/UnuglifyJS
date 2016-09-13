@@ -106,7 +106,7 @@ def EvaluateFileList(files):
 
     with open(RESULTSFILE, "a") as resultsFile:
       resultsFile.write(str(among_topk) + " / " + str(total_predictions) + "\n")
-      #resultsFile.write(str(float(among_topk)/total_predictions) + "\n")
+      resultsFile.write(str(float(among_topk)/total_predictions) + "\n")
   finally:
     shutil.rmtree(TMP_DIR)
 
