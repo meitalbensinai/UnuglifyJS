@@ -409,7 +409,7 @@ function processFile(file) {
 					var renamedQuery = features_result;
 					for (var i = 0; i < result.length; i++) {
 						if (result[i].hasOwnProperty("inf")) {
-							renamedQuery.assign[result[i].v].inf = UglifyJS.unescapeString(result[i].inf).green;
+							renamedQuery.assign[result[i].v].inf = result[i].inf;
 						}
 					}
 				} else {
@@ -423,7 +423,15 @@ function processFile(file) {
 					renamedQuery,
 					function(candidatesData) {
 						var candidates = JSON.parse(candidatesData);
-						for (var i = 0, len = candidates.result.length; i < len ; i++) {
+						var candidatesLength = 0;
+						try {
+							var candidatesLength = candidates.result.length;
+						} catch (ex) {
+							sys.error("ERROR: ".red + "could not get candidates length in file: '" + file + "': " + ex);
+							sys.error(JSON.stringify(candidatesData), null, "\t");
+							return;
+						}
+						for (var i = 0; i < candidatesLength ; i++) {
 							var nodeId = candidates.result[i].node;
 							var originalName = originalNames[nodeId];
 							var candidatesForNode = candidates.result[i].candidates;

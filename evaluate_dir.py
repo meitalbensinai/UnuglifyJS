@@ -62,21 +62,15 @@ def EvaluateFile(f):
 	nodejsCommand.append(original_features_flag)
   
   #print " ".join(nodejsCommand)
+
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
-    timer = Timer(300, kill, [sleeper])
+    #timer = Timer(600, kill, [sleeper])
 
-    try:
-      timer.start()
-      stdout, stderr = sleeper.communicate()
-    finally:
-      timer.cancel()
-
-    if (sleeper.poll() == 0):
-      if (len(stderr) > 0):
+    #timer.start()
+    stdout, stderr = sleeper.communicate()
+    if (len(stderr) > 0):
         print >> sys.stderr, stderr,
-    else:
-      print >> sys.stderr, 'file: ' + str(f) + ' was not completed in time'
 
 def EvaluateFileList(files):
   global TMP_DIR
