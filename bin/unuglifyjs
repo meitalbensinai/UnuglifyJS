@@ -413,6 +413,7 @@ function processFile(file) {
 								renamedQuery.assign[result[i].v].inf = result[i].inf;
 							} catch(ex) {
 								console.log("ERROR: ".red + "error renaming query in file: " + file + ", ex: " + ex);
+								console.log("variable number: (i=" + i +", node id = " + result[i].v);
 							}
 						}
 					}
