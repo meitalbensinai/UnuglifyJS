@@ -409,7 +409,11 @@ function processFile(file) {
 					var renamedQuery = features_result;
 					for (var i = 0; i < result.length; i++) {
 						if (result[i].hasOwnProperty("inf")) {
-							renamedQuery.assign[result[i].v].inf = result[i].inf;
+							try {
+								renamedQuery.assign[result[i].v].inf = result[i].inf;
+							} catch(ex) {
+								console.log("ERROR: ".red + "error renaming query in file: " + file + ", ex: " + ex);
+							}
 						}
 					}
 				} else {
