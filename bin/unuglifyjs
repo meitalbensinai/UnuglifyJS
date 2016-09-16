@@ -260,12 +260,17 @@ function processFile(file) {
 
 	if (ARGS.evaluate) {
 		var originalNames = getQueryNames(features_result);
-		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: true}});
+		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
+        if (minifiedFeatures.assign.length != features_result.assign.length) {
+            sys.error("Minification error in file: " + file + ", minified code has " + minifiedFeatures.assign.length + 
+                " elements, while original has " + features_result.assign.length);
+            return;
+        }
 		minifiedFeaturesJson = null;
 		//global.gc();
 
@@ -387,9 +392,14 @@ function processFile(file) {
 	}
 	if (ARGS.topk > 0) {
 		var originalNames = getQueryNames(features_result);
-		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: true}});
+		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
+        if (minifiedFeatures.assign.length != features_result.assign.length) {
+            sys.error("Minification error in file: " + file + ", minified code has " + minifiedFeatures.assign.length + 
+                " elements, while original has " + features_result.assign.length);
+            return;
+        }
 		minified = null;
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
 		minifiedFeaturesJson = null;
@@ -407,12 +417,17 @@ function processFile(file) {
 				else if (data_json.hasOwnProperty('result')) {
 					var result = data_json.result;
 					var renamedQuery = features_result;
+                    var nodeIdToPositionMap = [];
+                    for (var i = 0, len = renamedQuery.assign.length; i<len ; i++) {
+                        nodeIdToPositionMap[renamedQuery.assign[i].v] = i;
+                    }
 					for (var i = 0; i < result.length; i++) {
 						if (result[i].hasOwnProperty("inf")) {
 							try {
-								renamedQuery.assign[result[i].v].inf = result[i].inf;
-								if (i != result[i].v) {
-									console.log("i != result[i].v in file: " + file + ", i=" + i +", result[i] = " + result[i] + ", result[i].v = " + result[i].v);
+								var index = nodeIdToPositionMap[result[i].v];
+								renamedQuery.assign[index].inf = result[i].inf;
+								if (renamedQuery.assign[index].v != result[i].v) {
+									sys.error("assign[index].v != result[i].v in file: " + file + ", i=" + i +", result[i] = " + result[i] + ", result[i].v = " + result[i].v + ", index=" + index + ", assign[index].v=" + renamedQuery.assign[index].v);
 								}
 							} catch(ex) {
 								console.log("ERROR: ".red + "error renaming query in file: " + file + ", ex: " + ex);
@@ -450,9 +465,11 @@ function processFile(file) {
 								}
 							}
 							var rank = getCorrectPredictionRank(candidatesForNode, originalName);
-							if (rank == -1 && stripName(originalName) === stripName(renamedQuery.assign[nodeId].inf)) {
-								console.log("Error in file: " + file + ", original name: " + originalName + ", predicted correctly: " + renamedQuery.assign[nodeId].inf + "\n"
-									+ "but rank returned -1. " + stringify(candidatesForNode));
+                            var predictedName = renamedQuery.assign[nodeIdToPositionMap[nodeId]].inf;
+							if (rank == -1 && 
+                                stripName(originalName) === stripName(predictedName)) {
+								sys.error("Error in file: " + file + ", original name: " + originalName + ", predicted correctly: " + renamedQuery.assign[nodeId].inf + "\n"
+									+ "but rank returned -1. " + JSON.stringify(candidatesForNode));
 							}
 							//console.log("Rank for var '" + originalName + "': " + rank);
 							console.log(rank);
