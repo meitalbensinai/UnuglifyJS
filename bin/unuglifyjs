@@ -395,15 +395,15 @@ function processFile(file) {
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
-        if (minifiedFeatures.assign.length != features_result.assign.length) {
-            sys.error("Minification error in file: " + file + ", minified code has " + minifiedFeatures.assign.length + 
-                " elements, while original has " + features_result.assign.length);
-            return;
-        }
+
 		minified = null;
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
 		minifiedFeaturesJson = null;
-
+		if (minifiedFeatures.assign.length != features_result.assign.length) {
+			sys.error("Minification error in file: " + file + ", minified code has " + minifiedFeatures.assign.length +
+				" elements, while original has " + features_result.assign.length);
+			return;
+		}
 		callServer(
 			HOST,
 			PORT,
