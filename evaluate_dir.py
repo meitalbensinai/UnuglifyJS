@@ -111,10 +111,10 @@ def EvaluateFileList(files):
     #print float(correct_predictions)/total_predictions
     with open(LOGFILE, "a") as logFile:
       logFile.write(final_sum + "\n")
-      print float(correct_predictions)/total_predictions
+      logFile.write(str((correct_predictions)/total_predictions))
     with open(RESULTSFILE, "a") as resultsFile:
       resultsFile.write(final_sum + "\n")
-      print float(correct_predictions)/total_predictions
+      resultsFile.write(str(float(correct_predictions)/total_predictions))
   finally:
     shutil.rmtree(TMP_DIR)
 
