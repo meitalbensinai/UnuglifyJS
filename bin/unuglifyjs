@@ -461,7 +461,7 @@ function processFile(file) {
 							if (ARGS.print_candidates) {
 								console.log(originalName + ":");
 								for (var j = 0; j< candidatesForNode.length ; j++) {
-									console.log("\t" + candidatesForNode[j].candidate + ",\t\t" + candidatesForNode[i].score);
+									console.log("\t" + candidatesForNode[j].candidate + ",\t\t" + candidatesForNode[j].score);
 								}
 							}
 							var rank = getCorrectPredictionRank(candidatesForNode, originalName);
