@@ -1,4 +1,4 @@
-# infHistogram.py -<file>
+# infHistogram.py -<file> [--include_giv]
 import json
 import sys
 from collections import Counter, OrderedDict
@@ -6,6 +6,9 @@ from collections import Counter, OrderedDict
 if __name__ == '__main__':
 	trainingFileName = sys.argv[1]
 	histogram = {}
+	include_giv = False
+	if (len(sys.argv) > 2 and sys.argv[2] == '--include_giv'):
+		include_giv = True
 
 	with open(trainingFileName, "r") as trainingFile:
 		for line in trainingFile:
@@ -15,6 +18,12 @@ if __name__ == '__main__':
 			for varItem in assign:
 				if (varItem.has_key('inf')):
 					name = varItem['inf']
+					if histogram.has_key(name):
+						histogram[name] += 1
+					else:
+						histogram[name] = 1
+				elif (varItem.has_key('giv') and include_giv):
+					name = varItem['giv']
 					if histogram.has_key(name):
 						histogram[name] += 1
 					else:
