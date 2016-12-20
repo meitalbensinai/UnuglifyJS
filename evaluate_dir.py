@@ -12,7 +12,7 @@ from subprocess import Popen,PIPE, STDOUT, call
 def PrintUsage():
   print """
 Usage:
-  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] --num_threads <number> --max_path_length <number>  --max_path_width <number> --no-timeout
+  evaluate_dir.py --dir <directory> --nice2predict_server <server> --logfile <filename> --resultsfile <filename> [--original_features] --num_threads <number> --max_path_length <number> --max_path_width <number> --no-timeout
 """
   exit(1)
 

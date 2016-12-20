@@ -40,6 +40,10 @@ var ARGS = yargs
 	.default('show_graph', false)
 	.default('no_hash', false)
 	.default("print_candidates", false)
+	.default("skip_unary_features", false)
+	.default("to_glove", false)
+	.boolean("to_glove")
+	.boolean("skip_unary_features")
 	.boolean("print_candidates")
 	.boolean("no_hash")
 	.boolean("rename")
@@ -68,6 +72,17 @@ var ARGS = yargs
 ;
 
 normalize(ARGS);
+function gloveHasher(shouldHash) {
+	if (shouldHash) {
+		return function(str) {
+			return str.split('').reduce(function(prevHash, currVal) { return ((prevHash << 5) - prevHash) + currVal.charCodeAt(0);}, 0);
+		}
+	} else {
+		return function(str) {
+			return str;
+		}
+	}
+}
 
 function Hasher(shouldHash, saveReverseMapping) {
 	this.reverseHash = {};
@@ -172,7 +187,7 @@ for (var i = 0; i < files.length; i++) {
 
 function processFile(file) {
 	var code;
-	var hasher = new Hasher(!ARGS.no_hash, ARGS.show_graph);
+	var hasher = new Hasher(!(ARGS.no_hash || ARGS.to_glove), ARGS.show_graph);
 	try {
 		code = fs.readFileSync(file, "utf-8");
 	}
@@ -205,7 +220,7 @@ function processFile(file) {
 	try {
 		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width,
-			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher);
+			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -247,7 +262,31 @@ function processFile(file) {
 	} else {
 		//sys.error("OK: ".green + "'" + file + "'");
 	}*/
+	if (ARGS.to_glove) {
+		var glove_hasher = gloveHasher(!ARGS.no_hash);
+		var query = features_result.query;
+		var assign = features_result.assign;
+		for (var i = 0, len = query.length ; i < len ; i++) {
+			var currentFeature = query[i];
+			if (!currentFeature.hasOwnProperty('f2')) {
+				continue;
+			}
+			var leftOperand = assign[currentFeature.a];
+			var rightOperand = assign[currentFeature.b];
+			var leftLabel = leftOperand.hasOwnProperty('inf') ? leftOperand.inf : leftOperand.giv;
+			var rightLabel = rightOperand.hasOwnProperty('inf') ? rightOperand.inf : rightOperand.giv;
+			var path = currentFeature.f2;
+			if (leftLabel === rightLabel) {
+				console.log(leftLabel + " " + glove_hasher(path + ",self"));
+			}
+			else {
+				console.log(leftLabel + " " + glove_hasher(path + "," + rightLabel));
+				console.log(rightLabel + " " + glove_hasher(reverse(path) + "," + leftLabel));
+			}
+		}
 
+		return;
+	}
 	if (ARGS.extract_features) {
 		if (output.length > '{"query":[],"assign":[]}'.length) {
 			console.log(output);
@@ -262,7 +301,7 @@ function processFile(file) {
 		var originalNames = getQueryNames(features_result);
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
-			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features);
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
@@ -394,7 +433,7 @@ function processFile(file) {
 		var originalNames = getQueryNames(features_result);
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
-			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher);
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features);
 
 		minified = null;
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
@@ -546,7 +585,7 @@ function callServer(server, port, methodName, params, success_cb, error_cb) {
 	params.version = json.version;
 	data.params = params;
 	var post_data = JSON.stringify(data);
-
+	//console.log(post_data);
 	var options = {
 		host: server,
 		port: port,
@@ -595,4 +634,18 @@ function stripInterpreter(code){
 	}
 
 	return code.slice(code.indexOf('\n') + 1);
+}
+
+function reverse(path) {
+	var featureParts = path.split(/(_|\^)/);
+	featureParts.reverse();
+	for (var i=0, length = featureParts.length; i<length ; i++) {
+		if (featureParts[i] === '^') {
+			featureParts[i] = '_';
+		} else if (featureParts[i] === '_') {
+			featureParts[i] = '^';
+		}
+	}
+
+	return featureParts.join("");
 }
