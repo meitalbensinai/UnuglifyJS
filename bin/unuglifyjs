@@ -275,13 +275,15 @@ function processFile(file) {
 			var rightOperand = assign[currentFeature.b];
 			var leftLabel = leftOperand.hasOwnProperty('inf') ? leftOperand.inf : leftOperand.giv;
 			var rightLabel = rightOperand.hasOwnProperty('inf') ? rightOperand.inf : rightOperand.giv;
+			var stripLeftLabel = stripNameForGlove(leftLabel);
+			var stripRightLabel = stripNameForGlove(rightLabel);
 			var path = currentFeature.f2;
 			if (leftLabel === rightLabel) {
-				console.log(leftLabel + " " + glove_hasher(path + ",self"));
+				console.log(stripLeftLabel + " " + glove_hasher(path + ",self"));
 			}
 			else {
-				console.log(leftLabel + " " + glove_hasher(path + "," + rightLabel));
-				console.log(rightLabel + " " + glove_hasher(reverse(path) + "," + leftLabel));
+				console.log(stripLeftLabel + " " + glove_hasher(path + "," + stripRightLabel));
+				console.log(stripRightLabel + " " + glove_hasher(reverse(path) + "," + stripLeftLabel));
 			}
 		}
 
@@ -549,6 +551,10 @@ if (ARGS.package){
 
 function stripName(originalName) {
 	return originalName.toLowerCase().replace(/[^A-Za-z]/g, '');
+}
+
+function stripNameForGlove(originalName) {
+	return originalName.toLowerCase().replace(/[^A-Za-z0-9]/g, '');
 }
 
 function getQueryNames(features_result) {
