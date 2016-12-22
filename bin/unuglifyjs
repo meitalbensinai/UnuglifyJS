@@ -282,8 +282,8 @@ function processFile(file) {
 				console.log(stripLeftLabel + " " + glove_hasher(path + ",self"));
 			}
 			else {
-				console.log(stripLeftLabel + " " + glove_hasher(path + "," + stripRightLabel));
-				console.log(stripRightLabel + " " + glove_hasher(reverse(path) + "," + stripLeftLabel));
+				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel));
+				console.log(stripRightLabel + " *" + glove_hasher(reverse(path) + "," + stripLeftLabel));
 			}
 		}
 
