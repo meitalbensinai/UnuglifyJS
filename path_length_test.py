@@ -45,12 +45,12 @@ if __name__ == '__main__':
   
   #EvaluateFileList(files)
   for max_length_candidate in path_lengths:
-    command = "./extract_features.py --dir %s --max_path_length %d --max_path_width %d > training_data_%d" % (training_dir, max_length_candidate, path_width, max_length_candidate)
+    command = "./extract_features.py --dir %s --max_path_length %d --max_path_width %d > training_data_%dx%d" % (training_dir, max_length_candidate, path_width, max_length_candidate, path_width)
     print command
     os.system(command)
     
     os.chdir("../Nice2Predict")
-    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%d -training_method pl" % (num_threads, max_length_candidate)
+    command = "bin/training/train -num_threads %d  --input ./../UnuglifyJS/training_data_%dx%d -training_method pl" % (num_threads, max_length_candidate, path_width)
     print command
     exit_code = call(command.split(' '))
     if (exit_code != 0):
@@ -71,7 +71,7 @@ if __name__ == '__main__':
           print 'Nice2Server started'
 
       os.chdir("../UnuglifyJS")
-      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%d --resultsfile results_%d --empty --num_threads %d --max_path_length %d --max_path_width %d" % (test_dir, server, max_length_candidate, max_length_candidate, multiprocessing.cpu_count(), max_length_candidate, path_width)
+      command = "python ./evaluate_dir.py --dir %s --server %s --logfile evaluation_%dx%d --resultsfile results_%dx%d --empty --num_threads %d --max_path_length %d --max_path_width %d" % (test_dir, server, max_length_candidate, path_width, max_length_candidate, path_width, multiprocessing.cpu_count(), max_length_candidate, path_width)
       print command
       os.system(command)
     finally:
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
   print("Max path width=%d" % (path_width))
   for max_length_candidate in path_lengths:
-    with open("results_%d" % (max_length_candidate), "r") as resultsFile:
+    with open("results_%dx%d" % (max_length_candidate, path_width), "r") as resultsFile:
       line = resultsFile.readline().strip()
     print("MAX PATH LENGTH=%d: %s" % (max_length_candidate, line))
 
