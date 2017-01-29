@@ -6,6 +6,7 @@ import sys
 import shutil
 from subprocess import Popen,PIPE, STDOUT, call
 import time
+import signal
 
 def PrintUsage():
   print """
@@ -31,7 +32,7 @@ if __name__ == '__main__':
 
   training_file = sys.argv[2]
   if (sys.argv[7] == "--path_length"):
-    path_length = sys.argv[8]
+    path_length = int(sys.argv[8])
   if (sys.argv[3] == "--test_dir"):
     test_dir = sys.argv[4]
   if (sys.argv[5] == "--nice2predict_server"):
@@ -51,9 +52,9 @@ if __name__ == '__main__':
       print "Training failed for max path length = %d, exiting" % path_length
       sys.exit(0)
 
-    command = "./bin/server/nice2server"
-    print command
-    server_process = Popen(["./bin/server/nice2server", "--model %s" % training_file], stdout=PIPE, bufsize=1, stderr=STDOUT)
+    #command = "./bin/server/nice2server"
+    #print command
+    server_process = Popen(["./bin/server/nice2server --num_threads %d --model %s" % (num_threads, training_file)], stdout=PIPE, bufsize=1, stderr=STDOUT, shell=True, preexec_fn=os.setsid)
     #time.sleep(3)
     try:
       server_is_up = False
@@ -69,7 +70,8 @@ if __name__ == '__main__':
       print command
       os.system(command)
     finally:
-      server_process.send_signal(2)
+      #server_process.send_signal(2)
+      os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
       print "Nice2Server stopped"
 
 
