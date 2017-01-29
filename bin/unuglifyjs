@@ -220,7 +220,7 @@ function processFile(file) {
 	try {
 		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width,
-			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features);
+			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.to_glove);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
@@ -279,7 +279,7 @@ function processFile(file) {
 			var stripRightLabel = stripNameForGlove(rightLabel);
 			var path = currentFeature.f2;
 			if (leftLabel === rightLabel) {
-				console.log(stripLeftLabel + " " + glove_hasher(path + ",self"));
+				console.log(stripLeftLabel + " *" + glove_hasher(path + ",self"));
 			}
 			else {
 				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel));
@@ -554,6 +554,10 @@ function stripName(originalName) {
 }
 
 function stripNameForGlove(originalName) {
+	if (/^\d+$/.test(originalName)) {
+		// Is all digits
+		return originalName;
+	}
 	return originalName.toLowerCase().replace(/[^A-Za-z0-9]/g, '');
 }
 
