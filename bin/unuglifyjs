@@ -42,6 +42,8 @@ var ARGS = yargs
 	.default("print_candidates", false)
 	.default("skip_unary_features", false)
 	.default("to_glove", false)
+	.default("semi_paths", false)
+	.boolean("semi_paths")
 	.boolean("to_glove")
 	.boolean("skip_unary_features")
 	.boolean("print_candidates")
@@ -266,6 +268,7 @@ function processFile(file) {
 		var glove_hasher = gloveHasher(!ARGS.no_hash);
 		var query = features_result.query;
 		var assign = features_result.assign;
+		//var added_semi_path = new Array
 		for (var i = 0, len = query.length ; i < len ; i++) {
 			var currentFeature = query[i];
 			if (!currentFeature.hasOwnProperty('f2')) {
@@ -280,10 +283,17 @@ function processFile(file) {
 			var path = currentFeature.f2;
 			if (leftLabel === rightLabel) {
 				console.log(stripLeftLabel + " *" + glove_hasher(path + ",self"));
+				if (ARGS.semi_paths) {
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)));
+				}
 			}
 			else {
 				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel));
 				console.log(stripRightLabel + " *" + glove_hasher(reverse(path) + "," + stripLeftLabel));
+				if (ARGS.semi_paths) {
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)));
+					console.log(stripRightLabel + " *" + glove_hasher(semiPath(reverse(path))));
+				}
 			}
 		}
 
@@ -658,4 +668,17 @@ function reverse(path) {
 	}
 
 	return featureParts.join("");
+}
+
+function semiPath(path) {
+	var featureParts = path.split(/(_|\^)/);
+	var semiPath = []
+	for (var i=0, length = featureParts.length; i<length ; i++) {
+		if (featureParts[i] === '_') {
+			break;
+		}
+		semiPath.push(featureParts[i]);
+	}
+
+	return semiPath.join("");
 }
