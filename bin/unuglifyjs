@@ -568,7 +568,7 @@ function stripNameForGlove(originalName) {
 		// Is all digits
 		return originalName;
 	}
-	return originalName.toLowerCase().replace(/[^A-Za-z0-9]/g, '');
+	return originalName.toLowerCase().replace(/[^A-Za-z]/g, '');
 }
 
 function getQueryNames(features_result) {
