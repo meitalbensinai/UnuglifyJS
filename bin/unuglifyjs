@@ -568,6 +568,10 @@ function stripNameForGlove(originalName) {
 		// Is all digits
 		return originalName;
 	}
+	var stripped = originalName.toLowerCase().replace(/[^A-Za-z]/g, '');
+	if (stripped.length == 0) {
+		return originalName;
+	}
 	return originalName.toLowerCase().replace(/[^A-Za-z]/g, '');
 }
 
