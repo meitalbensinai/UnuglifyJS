@@ -42,9 +42,11 @@ var ARGS = yargs
 	.default("print_candidates", false)
 	.default("skip_unary_features", false)
 	.default("to_glove", false)
+	.default("include_giv_giv", false)
 	.default("semi_paths", false)
 	.boolean("semi_paths")
 	.boolean("to_glove")
+	.boolean("include_giv_giv")
 	.boolean("skip_unary_features")
 	.boolean("print_candidates")
 	.boolean("no_hash")
@@ -162,6 +164,9 @@ var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 if (ARGS.extract_features || ARGS.evaluate || ARGS.show_graph || ARGS.topk){
 	ARGS.rename = false;
 }
+if (ARGS.to_glove) {
+	ARGS.include_giv_giv = true;
+}
 
 var features = ARGS.features.split(",");
 for (var i = 0; i < features.length; i++) {
@@ -222,7 +227,7 @@ function processFile(file) {
 	try {
 		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width,
-			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.to_glove);
+			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.include_giv_giv);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
