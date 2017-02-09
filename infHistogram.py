@@ -1,7 +1,16 @@
 # infHistogram.py -<file> [--include_giv]
 import json
 import sys
+import re
 from collections import Counter, OrderedDict
+
+def strip(word):
+    lower = word.lower()
+    stripped = re.sub(r'[^a-zA-Z]','', lower)
+    if (len(stripped) == 0):
+        return lower
+    return stripped
+
 
 if __name__ == '__main__':
 	trainingFileName = sys.argv[1]
@@ -17,13 +26,13 @@ if __name__ == '__main__':
 			assign = singleProgramObject['assign']
 			for varItem in assign:
 				if (varItem.has_key('inf')):
-					name = varItem['inf']
+					name = strip(varItem['inf'])
 					if histogram.has_key(name):
 						histogram[name] += 1
 					else:
 						histogram[name] = 1
 				elif (varItem.has_key('giv') and include_giv):
-					name = varItem['giv']
+					name = strip(varItem['giv'])
 					if histogram.has_key(name):
 						histogram[name] += 1
 					else:
