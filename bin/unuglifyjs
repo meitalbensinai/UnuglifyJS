@@ -44,6 +44,8 @@ var ARGS = yargs
 	.default("to_glove", false)
 	.default("include_giv_giv", false)
 	.default("semi_paths", false)
+	.default("include_labels", false)
+	.boolean("include_labels")
 	.boolean("semi_paths")
 	.boolean("to_glove")
 	.boolean("include_giv_giv")
@@ -164,7 +166,7 @@ var PORT = parseInt(ARGS.nice2predict_server.split(":")[1]);
 if (ARGS.extract_features || ARGS.evaluate || ARGS.show_graph || ARGS.topk){
 	ARGS.rename = false;
 }
-if (ARGS.to_glove) {
+if (ARGS.to_glove && !ARGS.include_labels) {
 	ARGS.include_giv_giv = true;
 }
 
@@ -286,20 +288,29 @@ function processFile(file) {
 			var stripLeftLabel = stripNameForGlove(leftLabel);
 			var stripRightLabel = stripNameForGlove(rightLabel);
 			var path = currentFeature.f2;
+			var leftType = "";
+			var rightType = ""
+			if (ARGS.include_labels) {
+				leftType = leftOperand.hasOwnProperty('inf') ? " inf" : " giv";
+				rightType = rightOperand.hasOwnProperty('inf') ? " inf" : " giv";
+			}
 			if (leftLabel === rightLabel) {
-				console.log(stripLeftLabel + " *" + glove_hasher(path + ",self"));
+				console.log(stripLeftLabel + " *" + glove_hasher(path + ",self") + leftType);
 				if (ARGS.semi_paths) {
-					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)));
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + leftType);
 				}
 			}
 			else {
-				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel));
-				console.log(stripRightLabel + " *" + glove_hasher(reverse(path) + "," + stripLeftLabel));
+				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel) + leftType);
+				console.log(stripRightLabel + " *" + glove_hasher(reverse(path) + "," + stripLeftLabel) + rightType);
 				if (ARGS.semi_paths) {
-					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)));
-					console.log(stripRightLabel + " *" + glove_hasher(semiPath(reverse(path))));
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + leftType);
+					console.log(stripRightLabel + " *" + glove_hasher(semiPath(reverse(path)))+ rightType);
 				}
 			}
+		}
+		if (ARGS.include_labels) {
+			console.log("---")
 		}
 
 		return;
