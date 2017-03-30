@@ -44,4 +44,4 @@ if __name__ == '__main__':
     top = dict(Counter(histogram))
     sortedTopValues = OrderedDict(sorted(top.items(), key=lambda t: t[1], reverse=True))
     for key,value in sortedTopValues.items():
-        print str(key) + "," + str(value)
+        print str(key) + " " + str(value)
