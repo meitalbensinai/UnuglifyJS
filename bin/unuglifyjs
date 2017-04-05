@@ -45,6 +45,8 @@ var ARGS = yargs
 	.default("include_giv_giv", false)
 	.default("semi_paths", false)
 	.default("include_labels", false)
+	.default("no_paths", false)
+	.boolean("no_paths")
 	.boolean("include_labels")
 	.boolean("semi_paths")
 	.boolean("to_glove")
@@ -272,7 +274,7 @@ function processFile(file) {
 		//sys.error("OK: ".green + "'" + file + "'");
 	}*/
 	if (ARGS.to_glove) {
-		var glove_hasher = gloveHasher(!ARGS.no_hash);
+		var glove_hasher = gloveHasher(!(ARGS.no_hash || ARGS.no_paths));
 		var query = features_result.query;
 		var assign = features_result.assign;
 		//var added_semi_path = new Array
@@ -288,6 +290,10 @@ function processFile(file) {
 			var stripLeftLabel = stripNameForGlove(leftLabel);
 			var stripRightLabel = stripNameForGlove(rightLabel);
 			var path = currentFeature.f2;
+			if (ARGS.no_paths) {
+				path = "";
+				ARGS.semi_paths = false;
+			}
 			var leftType = "";
 			var rightType = ""
 			if (ARGS.include_labels) {
