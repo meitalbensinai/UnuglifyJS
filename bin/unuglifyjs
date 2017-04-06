@@ -46,6 +46,8 @@ var ARGS = yargs
 	.default("semi_paths", false)
 	.default("include_labels", false)
 	.default("no_paths", false)
+	.default("assign_only", false)
+	.boolean("assign_only")
 	.boolean("no_paths")
 	.boolean("include_labels")
 	.boolean("semi_paths")
@@ -323,7 +325,11 @@ function processFile(file) {
 	}
 	if (ARGS.extract_features) {
 		if (output.length > '{"query":[],"assign":[]}'.length) {
-			console.log(output);
+			if (ARGS.assign_only) {
+				console.log(JSON.stringify(features_result.assign, null, 0));
+			} else {
+				console.log(output);
+			}
 		}
 
 		return;
