@@ -3,12 +3,16 @@ import json
 import sys
 import re
 
-# Abandoned, because:
+# usage: python toGlove.py <data.json>
+# Limited, because:
 # 1. Already extracted files do not contain giv-giv relations
 # 2. Hashed paths cannot be reversed
+# 3. So this script needs to be applied only to extracted giv-giv json's, and reversed paths if they are wished
 
-def stripName(name):
-    return re.sub(r'[^a-zA-Z0-9]', '', name).lower()
+DUMMY = 'DUMMY'
+
+#def stripName(name):
+#    return re.sub(r'[^a-zA-Z0-9]', '', name).lower()
 
 if __name__ == '__main__':
     trainingFileName = sys.argv[1]
@@ -28,10 +32,13 @@ if __name__ == '__main__':
                 id = varItem['v']
                 if len(name) > 0:
                     idToName[id] = name
-            for path in query:
-                if not ('a' in path and 'b' in path and 'f2' in path):
+            for feature in query:
+                if not ('a' in feature and 'b' in feature and 'f2' in feature):
                     continue
-                name1 = idToName[path['a']]
-                name2 = idToName[path['b']]
-                strippedName1 = stripName(name1)
-                strippedName2 = stripName(name2)
+                name1 = idToName[feature['a']]
+                name2 = idToName[feature['b']]
+                if feature['a'] == feature['b']:
+                    name2 = 'self'
+                path = feature['f2']
+                print name1 + ' ' + path + ',' + name2
+
