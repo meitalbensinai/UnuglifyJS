@@ -10,6 +10,8 @@ var fs = require("fs");
 var http = require('http');
 var json = require("../package.json");
 
+var DUMMY = 'DUMMY'
+
 var ARGS = yargs
 	.usage("$0 input1.js \n")
 	.describe("rename", "Renames variables names with names learnt from large amount of non-obfuscated JavaScript code")
@@ -47,6 +49,8 @@ var ARGS = yargs
 	.default("include_labels", false)
 	.default("no_paths", false)
 	.default("assign_only", false)
+	.default("json_output", false)
+	.boolean("json_output")
 	.boolean("assign_only")
 	.boolean("no_paths")
 	.boolean("include_labels")
@@ -279,7 +283,39 @@ function processFile(file) {
 		var glove_hasher = gloveHasher(!(ARGS.no_hash || ARGS.no_paths));
 		var query = features_result.query;
 		var assign = features_result.assign;
-		//var added_semi_path = new Array
+		if (ARGS.json_output) {
+			var dummyId = assign.length;
+			for (var i = 0, len = assign.length ; i < len ; i++) {
+				var currentItem = assign[i];
+				if (currentItem.hasOwnProperty('inf')) {
+					currentItem.inf = stripNameForGlove(currentItem.inf);
+				}
+				if (currentItem.hasOwnProperty('giv')) {
+					currentItem.giv = stripNameForGlove(currentItem.giv);
+				}
+			}
+			assign.push({"v":dummyId,"giv":DUMMY});
+			for (var i = 0, len = query.length ; i < len ; i++) {
+				var currentFeature = query[i];
+				if (!currentFeature.hasOwnProperty('f2')) {
+					continue;
+				}
+				var fullPath = currentFeature.f2;
+				currentFeature.f2 = glove_hasher(fullPath);
+				var leftOperand = currentFeature.a;
+				var rightOperand = currentFeature.b;
+				query.push({"a":rightOperand,"b":leftOperand,"f2":glove_hasher(reverse(fullPath))})
+				if (ARGS.semi_paths) {
+					var hashedSemiPath = glove_hasher(semiPath(fullPath));
+					query.push({"a":leftOperand,"b":dummyId,"f2":hashedSemiPath})
+					var reverseHashedSemiPath = glove_hasher(semiPath(reverse(fullPath)));
+					query.push({"a":rightOperand,"b":dummyId,"f2":reverseHashedSemiPath})
+				}
+			}
+
+			console.log(JSON.stringify(features_result));
+			return;
+		}
 		for (var i = 0, len = query.length ; i < len ; i++) {
 			var currentFeature = query[i];
 			if (!currentFeature.hasOwnProperty('f2')) {
@@ -303,17 +339,17 @@ function processFile(file) {
 				rightType = rightOperand.hasOwnProperty('inf') ? " inf" : " giv";
 			}
 			if (leftLabel === rightLabel) {
-				console.log(stripLeftLabel + " *" + glove_hasher(path + ",self") + leftType);
+				console.log(stripLeftLabel + " *" + glove_hasher(path) + ",self" + leftType);
 				if (ARGS.semi_paths) {
-					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + leftType);
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + "," + DUMMY + leftType);
 				}
 			}
 			else {
-				console.log(stripLeftLabel + " *" + glove_hasher(path + "," + stripRightLabel) + leftType);
-				console.log(stripRightLabel + " *" + glove_hasher(reverse(path) + "," + stripLeftLabel) + rightType);
+				console.log(stripLeftLabel + " *" + glove_hasher(path) + "," + stripRightLabel + leftType);
+				console.log(stripRightLabel + " *" + glove_hasher(reverse(path)) + "," + stripLeftLabel + rightType);
 				if (ARGS.semi_paths) {
-					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + leftType);
-					console.log(stripRightLabel + " *" + glove_hasher(semiPath(reverse(path)))+ rightType);
+					console.log(stripLeftLabel + " *" + glove_hasher(semiPath(path)) + "," + DUMMY + leftType);
+					console.log(stripRightLabel + " *" + glove_hasher(semiPath(reverse(path))) + "," + DUMMY + rightType);
 				}
 			}
 		}
