@@ -40,5 +40,5 @@ if __name__ == '__main__':
                 if feature['a'] == feature['b']:
                     name2 = 'self'
                 path = feature['f2']
-                print name1 + ' ' + path + ',' + name2
+                print name1 + ' ' + str(path) + ',' + name2
 
