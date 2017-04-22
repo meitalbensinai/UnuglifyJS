@@ -20,7 +20,11 @@ if __name__ == '__main__':
     with open(trainingFileName, "r") as trainingFile:
         for line in trainingFile:
             line = line.rstrip('\n')
-            singleProgramObject = json.loads(line)
+            try:
+                singleProgramObject = json.loads(line)
+            except ValueError:
+                print >> sys.stderr, 'Bad JSON: ' + str(line)
+                continue
             assign = singleProgramObject['assign']
             query = singleProgramObject['query']
             for varItem in assign:
