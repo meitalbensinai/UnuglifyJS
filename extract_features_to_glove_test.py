@@ -61,10 +61,10 @@ def ExtractFeaturesForFileList(files):
     shutil.rmtree(TMP_DIR, ignore_errors=True)
   os.makedirs(TMP_DIR)
   try:
-    #p = multiprocessing.Pool(multiprocessing.cpu_count())
-    #p.map(ExtractFeaturesForFile, files)
-    for file in files:
-        ExtractFeaturesForFile(file)
+    p = multiprocessing.Pool(multiprocessing.cpu_count())
+    p.map(ExtractFeaturesForFile, files)
+    #for file in files:
+    #    ExtractFeaturesForFile(file)
     output_files = os.listdir(TMP_DIR)
     for f in output_files:
       os.system("cat %s/%s" % (TMP_DIR, f))

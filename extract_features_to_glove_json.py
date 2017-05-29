@@ -61,7 +61,7 @@ def ExtractFeaturesForFileList(files):
     shutil.rmtree(TMP_DIR, ignore_errors=True)
   os.makedirs(TMP_DIR)
   try:
-    p = multiprocessing.Pool(multiprocessing.cpu_count())
+    p = multiprocessing.Pool(32)
     p.map(ExtractFeaturesForFile, files)
     output_files = os.listdir(TMP_DIR)
     for f in output_files:
