@@ -379,7 +379,7 @@ function processFile(file) {
 		var originalNames = getQueryNames(features_result);
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
-			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.predict_alone);
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, false, ARGS.predict_alone);
 		console.log(minifiedFeaturesJson)
 		console.log(originalNames)
 		minified = null;
@@ -513,7 +513,7 @@ function processFile(file) {
 		var originalNames = getQueryNames(features_result);
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
-			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.predict_alone);
+			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, false, ARGS.predict_alone);
 
 		minified = null;
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
