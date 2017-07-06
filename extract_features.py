@@ -39,7 +39,7 @@ if ((len(sys.argv) > 6) and (sys.argv[5] == "--max_path_width")):
 	MAX_PATH_WIDTH = int(sys.argv[6])
 
 def ExtractFeaturesForFile(f):
-  command = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--extract_features', '--max_path_length=' + str(MAX_PATH_LENGTH), '--skip_minified', '--max_path_width=' +str(MAX_PATH_WIDTH)]
+  command = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--extract_features', '--max_path_length=' + str(MAX_PATH_LENGTH), '--skip_minified', '--max_path_width=' +str(MAX_PATH_WIDTH) --predict_alone]
   if (original_features != ""):
 	command.append(original_features)
   #os.system(command)
