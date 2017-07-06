@@ -45,7 +45,8 @@ def ExtractFeaturesForFile(f):
   if (original_features != ""):
 	command.append(original_features)
   #os.system(command)
-  
+
+  kill = lambda process: process.kill()
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(command, stdout=outputFile, stderr=subprocess.PIPE)
     timer = Timer(120, kill, [sleeper])
