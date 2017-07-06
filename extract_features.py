@@ -48,7 +48,14 @@ def ExtractFeaturesForFile(f):
   
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(command, stdout=outputFile, stderr=subprocess.PIPE)
-    stdout, stderr = sleeper.communicate()
+    timer = Timer(120, kill, [sleeper])
+    try:
+        timer.start()
+        stdout, stderr = sleeper.communicate()
+    finally:
+        timer.cancel()
+
+    #stdout, stderr = sleeper.communicate()
 
     if (sleeper.poll() == 0):
       if (len(stderr) > 0):
