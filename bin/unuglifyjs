@@ -71,6 +71,7 @@ var ARGS = yargs
 	.boolean("package")
 	.boolean("V")
 	.boolean("colors")
+	.boolean("predict_alone")
 	.string('max_path_length')
 	.string('max_path_width')
 	.string("features")
@@ -237,7 +238,7 @@ function processFile(file) {
 	try {
 		//global.gc();
 		var output = UglifyJS.extractFeatures(code, file, ARGS.print_ast, ARGS.max_path_length, ARGS.max_path_width,
-			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.include_giv_giv);
+			ARGS.skip_minified, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, ARGS.include_giv_giv, ARGS.predict_alone);
 		//global.gc();
 	} catch (ex){
 		if (ex instanceof UglifyJS.Parse_Error){
