@@ -58,6 +58,8 @@ if (len(sys.argv) > 16):
 
 def EvaluateFile(f):
   nodejsCommand = ['nodejs', '--max_old_space_size=64000', 'bin/unuglifyjs', f, '--evaluate', '--nice2predict_server=' + SERVER, '--max_path_length=' + str(MAX_PATH_LENGTH), '--max_path_width=' + str(MAX_PATH_WIDTH), '--skip_minified']
+  if '--predict_alone' in sys.argv:
+    nodejsCommand.append("--predict_alone")
   if (original_features_flag != ""):
 	nodejsCommand.append(original_features_flag)
   
@@ -65,10 +67,16 @@ def EvaluateFile(f):
 
   with open(TMP_DIR + str(os.getpid()), 'a') as outputFile:
     sleeper = subprocess.Popen(nodejsCommand, stdout=outputFile, stderr=subprocess.PIPE)
+    timer = Timer(120, kill, [sleeper])
+    try:
+        timer.start()
+        stdout, stderr = sleeper.communicate()
+    finally:
+        timer.cancel()
     #timer = Timer(600, kill, [sleeper])
 
     #timer.start()
-    stdout, stderr = sleeper.communicate()
+    #stdout, stderr = sleeper.communicate()
     if (len(stderr) > 0):
         print >> sys.stderr, stderr,
 
