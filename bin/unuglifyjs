@@ -272,6 +272,7 @@ function processFile(file) {
 		features_result = JSON.parse(output);
     } catch (e) {
 		sys.error("ERROR: ".red + "output is not valid JSON " + "'" + file + "'");
+		sys.error(output)
         throw e;
     }
 
