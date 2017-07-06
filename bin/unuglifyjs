@@ -272,7 +272,7 @@ function processFile(file) {
 		features_result = JSON.parse(output);
     } catch (e) {
 		sys.error("ERROR: ".red + "output is not valid JSON " + "'" + file + "'");
-		sys.error(output)
+		//sys.error(output)
         throw e;
     }
 
@@ -380,8 +380,8 @@ function processFile(file) {
 		var minified = UglifyJS.minify(code, {compress: false, fromString: true, mangle: {keep_fnames: false}});
 		var minifiedFeaturesJson = UglifyJS.extractFeatures(minified.code, file, ARGS.print_ast, ARGS.max_path_length,
 			ARGS.max_path_width, false, ARGS.original_features, ARGS.features, hasher, ARGS.skip_unary_features, false, ARGS.predict_alone);
-		console.log(minifiedFeaturesJson)
-		console.log(originalNames)
+		//console.log(minifiedFeaturesJson)
+		//console.log(originalNames)
 		minified = null;
 		//global.gc();
 		var minifiedFeatures = JSON.parse(minifiedFeaturesJson);
